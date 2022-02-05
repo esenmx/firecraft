@@ -58,9 +58,10 @@ extension FirestoreExtensions on FirebaseFirestore {
   /// ```
   List<String> textSearchArray(String text,
       {int elementLength = 3, String separator = ' '}) {
-    return text
-        .createIndexes(elementLength: elementLength, separator: separator)
-        .toList();
+    return List<String>.from(text.createIndexes(
+      elementLength: elementLength,
+      separator: separator,
+    ));
   }
 
   /// For [containsAll] text search
@@ -77,15 +78,17 @@ extension FirestoreExtensions on FirebaseFirestore {
   /// ```
   /// Then, something similar to this:
   /// ```dart
-  /// Query<Model> query; // the base [Query]
-  ///   for (final t in keyword.split(' ')) {
-  ///     query = query.where('search', arrayContains: t);
-  ///   }
+  /// var Query<Model> query = MyBaseQuery();
+  /// for (final t in keyword.split(' ')) {
+  ///   query = query.where('search', arrayContains: t);
+  /// }
   /// ```
   Map<String, bool> textSearchMap(String text,
       {int elementLength = 3, String separator = ' '}) {
-    final indexes =
-        text.createIndexes(elementLength: elementLength, separator: separator);
+    final indexes = text.createIndexes(
+      elementLength: elementLength,
+      separator: separator,
+    );
     return {for (final element in indexes) element: true};
   }
 }
