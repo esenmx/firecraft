@@ -30,11 +30,6 @@ extension FirestoreStringExtensions on String {
         .where((e) => e.isNotEmpty)
         .map((e) => e.toLowerCase());
   }
-}
-
-extension FirestoreExtensions on FirebaseFirestore {
-  /// https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
-  int get equalityLimitation => 10;
 
   /// For [contains] or [containsAny] text search
   ///
@@ -44,7 +39,7 @@ extension FirestoreExtensions on FirebaseFirestore {
   ///   fromFirestore: (snapshot, options) => Model.fromJson(snapshot.data()!),
   ///   toFirestore: (model, options) {
   ///     return model.toJson()
-  ///       ..['search'] = FirebaseFirestore.instance.textSearchArray(model.text);
+  ///       ..['search'] = model.text.textSearchArray();
   ///   },
   /// );
   /// ```
@@ -72,7 +67,7 @@ extension FirestoreExtensions on FirebaseFirestore {
   ///   fromFirestore: (snapshot, options) => Model.fromJson(snapshot.data()!),
   ///   toFirestore: (model, options) {
   ///     return model.toJson()
-  ///       ..['search'] = FirebaseFirestore.instance.textSearchMap(model.text);
+  ///       ..['search'] = model.text.textSearchMap();
   ///   },
   /// );
   /// ```
@@ -83,9 +78,9 @@ extension FirestoreExtensions on FirebaseFirestore {
   ///   query = query.where('search', arrayContains: t);
   /// }
   /// ```
-  Map<String, bool> textSearchMap(String text,
+  Map<String, bool> textSearchMap(
       {int elementLength = 3, String separator = ' '}) {
-    final indexes = text.createIndexes(
+    final indexes = createIndexes(
       elementLength: elementLength,
       separator: separator,
     );

@@ -1,6 +1,7 @@
 library firestorex;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firestorex/src/utils.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 

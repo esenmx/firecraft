@@ -1,20 +1,22 @@
 part of firestorex;
 
-/// todo
+/// todo doc
 class FirestoreSearchFormatter extends TextInputFormatter {
-  FirestoreSearchFormatter({this.separator = ''});
+  FirestoreSearchFormatter({this.separator = ' '});
 
   final String separator;
 
   @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.endsWith('$separator$separator')) {
+  formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    final newText = newValue.text;
+    if (newText.startsWith(separator)) {
       return oldValue;
     }
-    if (newValue.text.endsWith(separator)) {
-      if (newValue.text._tune(separator).length ==
-          FirebaseFirestore.instance.equalityLimitation) {
+    if (newText.endsWith(separator + separator)) {
+      return oldValue;
+    }
+    if (newText.endsWith(separator)) {
+      if (newText._tune(separator).length == kFirestoreQueryEqualityLimit) {
         return oldValue;
       }
     }
