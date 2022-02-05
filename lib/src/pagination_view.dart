@@ -1,15 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+part of firestorex;
 
 class FirestorePaginationView<T extends Object?> extends StatefulWidget {
-  const FirestorePaginationView({
+  FirestorePaginationView({
     Key? key,
-    required this.colRef,
     required this.query,
     this.paginationExtent = 200,
-  }) : super(key: key);
+  })  : assert(
+          query.parameters.containsKey('limit'),
+          "limit parameter is a must for pagination;\t"
+          "if you don't need to limit your query, probably you won't need"
+          "the pagination",
+        ),
+        super(key: key);
 
-  final CollectionReference<T> colRef;
   final Query<T> query;
   final double paginationExtent;
 
@@ -25,17 +28,12 @@ class _FirestorePaginationViewState<T extends Object?>
 
   @override
   void initState() {
-    assert(
-        widget.query.parameters.containsKey('limit'),
-        'limit parameter is a must for pagination;'
-        "if you don't need to limit your query, probably you won't need pagination");
-
     super.initState();
   }
 
   @override
   void didUpdateWidget(covariant FirestorePaginationView<T> oldWidget) {
-    if (widget.query != oldWidget.query || widget.colRef != oldWidget.colRef) {
+    if (widget.query != oldWidget.query) {
       // todo reset
     }
     super.didUpdateWidget(oldWidget);

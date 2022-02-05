@@ -19,5 +19,9 @@ dev_dependencies:
   flutter_lints: ^1.0.0
   fake_cloud_firestore: ^1.2.0
   mockito: ^5.0.17
+  test_utils:
+    git:
+      url: https://github.com/esenmx/test_utils
+      ref: main
 
 flutter:

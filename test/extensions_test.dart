@@ -1,20 +1,20 @@
-import 'package:firestorex/src/extensions.dart';
+import 'package:firestorex/firestorex.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() async {
-  group('FirestoreString', () {
-    test('firestoreSearchQueries', () {
-      expect([], ''.textSearchQueries());
-      expect([], '       '.textSearchQueries());
-      expect([], '---------'.textSearchQueries(sep: '-'));
-      expect(['dashx'], 'dashx'.textSearchQueries(minLen: 5));
+  group('FirestoreStringExtensions', () {
+    test('createIndexes', () {
+      expect([], ''.createIndexes());
+      expect([], '       '.createIndexes());
+      expect([], '---------'.createIndexes(separator: '-'));
+      expect(['dashx'], 'dashx'.createIndexes(elementLength: 5));
       expect(
         [
           'das',
           'dash',
           'dashx',
         ],
-        'dashx'.textSearchQueries(),
+        'dashx'.createIndexes().toList(),
       );
       expect(
         [
@@ -25,7 +25,7 @@ void main() async {
           'ese',
           'esen',
         ],
-        ' Mehmet Esen '.textSearchQueries(),
+        ' Mehmet Esen '.createIndexes().toList(),
       );
       expect(
         [
@@ -36,17 +36,13 @@ void main() async {
           'déjeune',
           'déjeuner',
         ],
-        ' le  petit    déjeuner'.textSearchQueries(minLen: 5),
+        ' le  petit    déjeuner'.createIndexes(elementLength: 5).toList(),
       );
       expect(
-        [
-          'dart',
-          'go',
-          'rust',
-          'python',
-          'c',
-        ],
-        'dart,,,,go,,,rust,,python,c'.textSearchQueries(minLen: 6, sep: ','),
+        ['dart', 'go', 'rust&c'],
+        'dart,,,,go,rust&c'
+            .createIndexes(elementLength: 6, separator: ',')
+            .toList(),
       );
     });
   });

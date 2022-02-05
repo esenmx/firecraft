@@ -1,20 +1,18 @@
-extension FirestoreString on String {
-  /// [minLen]: Minimum length of subStrings
-  /// [sep]: Separators between strings
-  Iterable<String> textSearchQueries({int minLen = 3, String sep = ' '}) sync* {
-    assert(minLen > 0, 'minimum length must be positive');
-    final subs = split(sep).where((e) {
-      /// Eliminating dangling separators, possible double white-spaces etc.
-      return e.isNotEmpty;
-    }).map((e) {
-      /// Eliminates conflicts conflicts like Turkish 'i-İ' and English i-I
-      /// Reduces char-pool
-      return e.toLowerCase();
-    });
-    for (final s in subs) {
-      if (s.length > minLen) {
-        final buffer = StringBuffer(s.substring(0, minLen - 1));
-        for (int i = minLen - 1; i < s.length; i++) {
+part of firestorex;
+
+extension FirestoreStringExtensions on String {
+  /// An opinionated way to handle text searches in [Firestore]
+  /// Instead bloating your model with index/query field, mutate your [toJson]
+  /// method within converter via [textSearchArray] or [textSearchMap]
+  @visibleForTesting
+  Iterable<String> createIndexes(
+      {int elementLength = 3, String separator = ' '}) sync* {
+    assert(elementLength > 0, 'minimum length must be positive');
+
+    for (final s in _tune(separator)) {
+      if (s.length > elementLength) {
+        final buffer = StringBuffer(s.substring(0, elementLength - 1));
+        for (int i = elementLength - 1; i < s.length; i++) {
           buffer.writeCharCode(s.codeUnitAt(i));
           yield buffer.toString();
         }
@@ -25,7 +23,69 @@ extension FirestoreString on String {
     }
   }
 
-  Map<String, bool> textSearchJson({int minLen = 3, String sep = ' '}) {
-    return {for (final str in textSearchQueries(minLen: minLen, sep: sep)) str: true};
+  /// Eliminates empty split strings and lowercase all of them
+  /// [toLowerCase()] eliminates conflicts like Turkish i-İ, English i-I
+  Iterable<String> _tune(String separator) {
+    return split(separator)
+        .where((e) => e.isNotEmpty)
+        .map((e) => e.toLowerCase());
+  }
+}
+
+extension FirestoreExtensions on FirebaseFirestore {
+  /// https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
+  int get equalityLimitation => 10;
+
+  /// For [contains] or [containsAny] text search
+  ///
+  /// Example:
+  /// ```dart
+  /// final collection = firestore.collection('objects').withConverter<Model>(
+  ///   fromFirestore: (snapshot, options) => Model.fromJson(snapshot.data()!),
+  ///   toFirestore: (model, options) {
+  ///     return model.toJson()
+  ///       ..['search'] = FirebaseFirestore.instance.textSearchArray(model.text);
+  ///   },
+  /// );
+  /// ```
+  /// Then, something similar to this:
+  /// ```dart
+  /// firestore.collection('objects').where('search', arrayContains: [keyword]);
+  /// ```
+  /// OR
+  /// ```dart
+  /// firestore.collection('objects').where('search', arrayContainsAny: [keywords]);
+  /// ```
+  List<String> textSearchArray(String text,
+      {int elementLength = 3, String separator = ' '}) {
+    return text
+        .createIndexes(elementLength: elementLength, separator: separator)
+        .toList();
+  }
+
+  /// For [containsAll] text search
+  ///
+  /// Example:
+  /// ```dart
+  /// final collection = firestore.collection('objects').withConverter<Model>(
+  ///   fromFirestore: (snapshot, options) => Model.fromJson(snapshot.data()!),
+  ///   toFirestore: (model, options) {
+  ///     return model.toJson()
+  ///       ..['search'] = FirebaseFirestore.instance.textSearchMap(model.text);
+  ///   },
+  /// );
+  /// ```
+  /// Then, something similar to this:
+  /// ```dart
+  /// Query<Model> query; // the base [Query]
+  ///   for (final t in keyword.split(' ')) {
+  ///     query = query.where('search', arrayContains: t);
+  ///   }
+  /// ```
+  Map<String, bool> textSearchMap(String text,
+      {int elementLength = 3, String separator = ' '}) {
+    final indexes =
+        text.createIndexes(elementLength: elementLength, separator: separator);
+    return {for (final element in indexes) element: true};
   }
 }
