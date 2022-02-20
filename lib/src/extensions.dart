@@ -51,9 +51,11 @@ extension FirestoreStringExtensions on String {
   /// ```dart
   /// firestore.collection('objects').where('search', arrayContainsAny: [keywords]);
   /// ```
-  List<String> textSearchArray(String text,
-      {int elementLength = 3, String separator = ' '}) {
-    return List<String>.from(text.createIndexes(
+  List<String> textSearchArray({
+    int elementLength = 3,
+    String separator = ' ',
+  }) {
+    return List<String>.from(createIndexes(
       elementLength: elementLength,
       separator: separator,
     ));
@@ -78,8 +80,10 @@ extension FirestoreStringExtensions on String {
   ///   query = query.where('search', arrayContains: t);
   /// }
   /// ```
-  Map<String, bool> textSearchMap(
-      {int elementLength = 3, String separator = ' '}) {
+  Map<String, bool> textSearchMap({
+    int elementLength = 3,
+    String separator = ' ',
+  }) {
     final indexes = createIndexes(
       elementLength: elementLength,
       separator: separator,
