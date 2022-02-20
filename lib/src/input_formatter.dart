@@ -2,9 +2,13 @@ part of firestorex;
 
 /// todo doc
 class FirestoreSearchFormatter extends TextInputFormatter {
-  FirestoreSearchFormatter({this.separator = ' '});
+  FirestoreSearchFormatter({
+    this.separator = ' ',
+    this.length = QueryLimitations.kMaxQueryEquality,
+  });
 
   final String separator;
+  final int length;
 
   @override
   formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
@@ -16,7 +20,7 @@ class FirestoreSearchFormatter extends TextInputFormatter {
       return oldValue;
     }
     if (newText.endsWith(separator)) {
-      if (newText._tune(separator).length == kFirestoreQueryEqualityLimit) {
+      if (newText._textSearchTune(separator).length == length) {
         return oldValue;
       }
     }

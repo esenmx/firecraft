@@ -9,7 +9,7 @@ extension FirestoreStringExtensions on String {
       {int elementLength = 3, String separator = ' '}) sync* {
     assert(elementLength > 0, 'minimum length must be positive');
 
-    for (final s in _tune(separator)) {
+    for (final s in _textSearchTune(separator)) {
       if (s.length > elementLength) {
         final buffer = StringBuffer(s.substring(0, elementLength - 1));
         for (int i = elementLength - 1; i < s.length; i++) {
@@ -25,7 +25,7 @@ extension FirestoreStringExtensions on String {
 
   /// Eliminates empty split strings and lowercase all of them
   /// [toLowerCase()] eliminates conflicts like Turkish i-İ, English i-I
-  Iterable<String> _tune(String separator) {
+  Iterable<String> _textSearchTune(String separator) {
     return split(separator)
         .where((e) => e.isNotEmpty)
         .map((e) => e.toLowerCase());
