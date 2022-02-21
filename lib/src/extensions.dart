@@ -80,6 +80,9 @@ extension FirestoreStringExtensions on String {
   ///   query = query.where('search', arrayContains: t);
   /// }
   /// ```
+  /// [Caution]!!! Always create nested objects for searching, otherwise you
+  /// should manage your indexes. See:
+  /// https://firebase.google.com/docs/firestore/solutions/index-map-field
   Map<String, bool> textSearchMap({
     int elementLength = 3,
     String separator = ' ',
@@ -89,5 +92,18 @@ extension FirestoreStringExtensions on String {
       separator: separator,
     );
     return {for (final element in indexes) element: true};
+  }
+}
+
+extension IterableDocumentSnapshotExtensions<T>
+    on Iterable<DocumentSnapshot<T>> {
+  Map<String, T> get idDataMap {
+    return {for (final doc in this) doc.id: doc.data()!};
+  }
+
+  Iterable<MapEntry<String, T>> get idDataEntries sync* {
+    for (final doc in this) {
+      yield MapEntry(doc.id, doc.data()!);
+    }
   }
 }

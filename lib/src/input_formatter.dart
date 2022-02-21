@@ -4,7 +4,7 @@ part of firestorex;
 class FirestoreSearchFormatter extends TextInputFormatter {
   FirestoreSearchFormatter({
     this.separator = ' ',
-    this.length = QueryLimitations.kMaxQueryEquality,
+    this.length = QueryLimitations.kMaxEquality,
   });
 
   final String separator;
