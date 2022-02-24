@@ -1,6 +1,6 @@
 part of firestorex;
 
-extension FirestoreStringExtensions on String {
+extension StringEx on String {
   /// An opinionated way to handle text searches in [Firestore]
   /// Instead bloating your model with index/query field, mutate your [toJson]
   /// method within converter via [textSearchArray] or [textSearchMap]
@@ -95,8 +95,7 @@ extension FirestoreStringExtensions on String {
   }
 }
 
-extension IterableDocumentSnapshotExtensions<T>
-    on Iterable<DocumentSnapshot<T>> {
+extension IterableDocumentSnapshotEx<T> on Iterable<DocumentSnapshot<T>> {
   Map<String, T> get idDataMap {
     return {for (final doc in this) doc.id: doc.data()!};
   }
@@ -105,5 +104,33 @@ extension IterableDocumentSnapshotExtensions<T>
     for (final doc in this) {
       yield MapEntry(doc.id, doc.data()!);
     }
+  }
+}
+
+extension CollectionReferenceEx<T> on CollectionReference<T> {
+  Future<List<QuerySnapshot<T>>> getDocumentsByIds(
+    Iterable<String> ids, [
+    int subListLength = FireLimits.kMaxContains,
+  ]) {
+    return Future.wait(ids.to2D(subListLength).map((e) {
+      return where(FieldPath.documentId, whereIn: e.toList()).get();
+    }));
+  }
+
+  Iterable<Stream<QuerySnapshot<T>>> documentSnapshotsByIds(
+    Iterable<String> ids, [
+    int subListLength = FireLimits.kMaxContains,
+  ]) {
+    return ids.to2D(subListLength).map((e) {
+      return where(FieldPath.documentId, whereIn: e.toList()).snapshots();
+    });
+  }
+}
+
+extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
+  Iterable<T> get toData => expand((e) => e.docs).map((e) => e.data()!);
+
+  Map<String, T> get toIdDataMap {
+    return {for (final value in expand((e) => e.docs)) value.id: value.data()!};
   }
 }

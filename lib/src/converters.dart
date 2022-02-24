@@ -1,54 +1,37 @@
 part of firestorex;
 
-class DateTimeConverter implements JsonConverter<DateTime, Timestamp> {
-  const DateTimeConverter();
+class DateTimeTimestampConv implements JsonConverter<DateTime, dynamic> {
+  const DateTimeTimestampConv();
 
   @override
-  DateTime fromJson(Timestamp value) => value.toDate();
-
-  @override
-  Timestamp toJson(DateTime value) => Timestamp.fromDate(value);
-}
-
-class DateTimeNullConverter implements JsonConverter<DateTime?, Timestamp?> {
-  const DateTimeNullConverter();
-
-  @override
-  DateTime? fromJson(Timestamp? value) => value?.toDate();
-
-  @override
-  Timestamp? toJson(DateTime? value) =>
-      value == null ? null : Timestamp.fromDate(value);
-}
-
-class ServerTimestampConverter implements JsonConverter<DateTime?, dynamic> {
-  const ServerTimestampConverter();
-
-  @override
-  DateTime? fromJson(dynamic timestamp) {
-    if (timestamp is Timestamp) {
-      return timestamp.toDate();
-    }
-    return null;
+  DateTime fromJson(dynamic value) {
+    assert(value is Timestamp);
+    return value.toDate();
   }
 
   @override
-  dynamic toJson(_) => FieldValue.serverTimestamp();
+  dynamic toJson(DateTime value) {
+    if (value == FireFlags.serverDateTime) {
+      return FieldValue.serverTimestamp();
+    }
+    return Timestamp.fromDate(value);
+  }
 }
 
-class ServerTimestampNullConverter
-    implements JsonConverter<DateTime?, Object?> {
-  const ServerTimestampNullConverter();
+class NullDateTimeTimestampConv implements JsonConverter<DateTime?, dynamic> {
+  const NullDateTimeTimestampConv();
 
   @override
-  DateTime? fromJson(Object? timestamp) {
-    if (timestamp is Timestamp) {
-      return timestamp.toDate();
-    }
-    return null;
+  DateTime? fromJson(dynamic value) {
+    assert(value == null || value is Timestamp);
+    return value?.toDate();
   }
 
   @override
-  Object? toJson(DateTime? date) =>
-      date != null ? FieldValue.serverTimestamp() : null;
+  dynamic toJson(DateTime? value) {
+    if (value == FireFlags.serverDateTime) {
+      return FieldValue.serverTimestamp();
+    }
+    return value == null ? null : Timestamp.fromDate(value);
+  }
 }
