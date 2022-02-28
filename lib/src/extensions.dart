@@ -9,9 +9,9 @@ extension StringEx on String {
       {int elementLength = 3, String separator = ' '}) sync* {
     assert(elementLength > 0, 'minimum length must be positive');
 
-    for (final s in _textSearchTune(separator)) {
+    for (var s in _textSearchTune(separator)) {
       if (s.length > elementLength) {
-        final buffer = StringBuffer(s.substring(0, elementLength - 1));
+        var buffer = StringBuffer(s.substring(0, elementLength - 1));
         for (int i = elementLength - 1; i < s.length; i++) {
           buffer.writeCharCode(s.codeUnitAt(i));
           yield buffer.toString();
@@ -91,16 +91,16 @@ extension StringEx on String {
       elementLength: elementLength,
       separator: separator,
     );
-    return {for (final element in indexes) element: true};
+    return {for (var element in indexes) element: true};
   }
 }
 
 extension IterableDocumentSnapshotEx<T> on Iterable<DocumentSnapshot<T>> {
-  Map<String, T> get idDataMap {
-    return {for (final doc in this) doc.id: doc.data()!};
+  Map<String, T> get toIdDataMap {
+    return {for (var doc in this) doc.id: doc.data()!};
   }
 
-  Iterable<MapEntry<String, T>> get idDataEntries sync* {
+  Iterable<MapEntry<String, T>> get toIdDataEntries sync* {
     for (final doc in this) {
       yield MapEntry(doc.id, doc.data()!);
     }
@@ -108,7 +108,7 @@ extension IterableDocumentSnapshotEx<T> on Iterable<DocumentSnapshot<T>> {
 }
 
 extension CollectionReferenceEx<T> on CollectionReference<T> {
-  Future<List<QuerySnapshot<T>>> getDocumentsByIds(
+  Future<List<QuerySnapshot<T>>> batchDocByIds(
     Iterable<String> ids, [
     int subListLength = FireLimits.kMaxContains,
   ]) {
@@ -117,7 +117,7 @@ extension CollectionReferenceEx<T> on CollectionReference<T> {
     }));
   }
 
-  Iterable<Stream<QuerySnapshot<T>>> documentSnapshotsByIds(
+  Iterable<Stream<QuerySnapshot<T>>> batchDocSnapshotsByIds(
     Iterable<String> ids, [
     int subListLength = FireLimits.kMaxContains,
   ]) {
@@ -131,6 +131,12 @@ extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
   Iterable<T> get toData => expand((e) => e.docs).map((e) => e.data()!);
 
   Map<String, T> get toIdDataMap {
-    return {for (final value in expand((e) => e.docs)) value.id: value.data()!};
+    return {for (var value in expand((e) => e.docs)) value.id: value.data()!};
+  }
+}
+
+extension QuerySnapshotEx<T> on QuerySnapshot<T> {
+  Map<String, T> get toIdDataMap {
+    return <String, T>{for (var doc in docs) doc.id: doc.data()!};
   }
 }
