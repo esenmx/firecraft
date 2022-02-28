@@ -105,6 +105,8 @@ extension IterableDocumentSnapshotEx<T> on Iterable<DocumentSnapshot<T>> {
       yield MapEntry(doc.id, doc.data()!);
     }
   }
+
+  Iterable<T> get toData => map((e) => e.data()!);
 }
 
 extension CollectionReferenceEx<T> on CollectionReference<T> {
@@ -128,7 +130,7 @@ extension CollectionReferenceEx<T> on CollectionReference<T> {
 }
 
 extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
-  Iterable<T> get toData => expand((e) => e.docs).map((e) => e.data()!);
+  Iterable<T> get toExpandedData => expand((e) => e.docs).map((e) => e.data()!);
 
   Map<String, T> get toIdDataMap {
     return {for (var value in expand((e) => e.docs)) value.id: value.data()!};
@@ -139,4 +141,6 @@ extension QuerySnapshotEx<T> on QuerySnapshot<T> {
   Map<String, T> get toIdDataMap {
     return <String, T>{for (var doc in docs) doc.id: doc.data()!};
   }
+
+  Iterable<T> get toData => docs.map((e) => e.data()!);
 }
