@@ -96,6 +96,8 @@ extension StringEx on String {
 }
 
 extension IterableDocumentSnapshotEx<T> on Iterable<DocumentSnapshot<T>> {
+  Iterable<String> get docIds => map((e) => e.id);
+
   Map<String, T> get toIdDataMap {
     return {for (var doc in this) doc.id: doc.data()!};
   }
@@ -130,6 +132,8 @@ extension CollectionReferenceEx<T> on CollectionReference<T> {
 }
 
 extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
+  Iterable<String> get docIds => expand((s) => s.docs.map((d) => d.id));
+
   Iterable<T> get toExpandedData => expand((e) => e.docs).map((e) => e.data()!);
 
   Map<String, T> get toIdDataMap {
@@ -138,9 +142,11 @@ extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
 }
 
 extension QuerySnapshotEx<T> on QuerySnapshot<T> {
+  Iterable<String> get docIds => docs.map((e) => e.id);
+
+  Iterable<T> get toData => docs.map((e) => e.data()!);
+
   Map<String, T> get toIdDataMap {
     return <String, T>{for (var doc in docs) doc.id: doc.data()!};
   }
-
-  Iterable<T> get toData => docs.map((e) => e.data()!);
 }
