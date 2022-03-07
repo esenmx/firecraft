@@ -2,7 +2,6 @@ library firestorex;
 
 import 'dart:async';
 
-import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dashx/dashx.dart';
 import 'package:flutter/services.dart';
@@ -13,4 +12,5 @@ part 'src/converters.dart';
 part 'src/extensions.dart';
 part 'src/helpers.dart';
 part 'src/input_formatter.dart';
-part 'src/pagination_view.dart';
+part 'src/query_get.dart';
+part 'src/query_listen.dart';
