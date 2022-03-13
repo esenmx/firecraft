@@ -11,11 +11,8 @@ class QueryGetListView<T extends Object?> extends StatefulWidget {
     this.scrollExtent = 200,
     this.loader,
     this.separator,
-  })  : assert(
-          query.parameters.containsKey('limit'),
-          "limit parameter is a must for pagination;\t"
-          "if you don't need to limit your query, no pagination is required",
-        ),
+  })  : assert(query.parameters.containsKey('limit'),
+            'limit parameter is required for pagination'),
         super(key: key);
 
   final Query<T> query;
@@ -51,7 +48,7 @@ class _QueryGetListViewState<T> extends State<QueryGetListView<T>> {
   }
 
   Future<void> paginate() async {
-    if (!paginating) {
+    if (!paginating && mounted) {
       setState(() {
         paginating = true;
       });
