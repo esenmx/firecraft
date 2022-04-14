@@ -150,3 +150,21 @@ extension QuerySnapshotEx<T> on QuerySnapshot<T> {
     return <String, T>{for (var doc in docs) doc.id: doc.data()!};
   }
 }
+
+extension IterableExtensions<E> on Iterable<E> {
+  /// [1, 2, 3, 4, 5, 6].convertTo2D(2) == [[1, 2], [3, 4], [5, 6]]
+  /// [1, 2, 3, 4].convertTo2D(3) == [[1, 2, 3], [4]]
+  Iterable<List<E>> to2D(int div) sync* {
+    RangeError.range(div, 1, 1 << 31);
+    final iterator = this.iterator;
+    while (iterator.moveNext()) {
+      final subArray = <E>[iterator.current];
+      for (int i = 0; i < div - 1; i++) {
+        if (iterator.moveNext()) {
+          subArray.add(iterator.current);
+        }
+      }
+      yield subArray;
+    }
+  }
+}
