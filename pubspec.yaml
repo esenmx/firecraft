@@ -13,9 +13,9 @@ dependencies:
   cloud_firestore: ">=3.0.0 <4.0.0"
   async: ^2.8.2
   json_annotation: ">=4.0.0 <5.0.0"
-  dashx:
+  fluiver:
     git:
-      url: https://github.com/esenmx/dashx
+      url: https://github.com/esenmx/fluiver
       ref: master
 
 dev_dependencies:
