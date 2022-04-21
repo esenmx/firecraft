@@ -3,45 +3,22 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() async {
   test('createIndexes', () {
-    expect([], ''.createIndexes());
-    expect([], '       '.createIndexes());
-    expect([], '---------'.createIndexes(separator: '-'));
-    expect(['dashx'], 'dashx'.createIndexes(elementLength: 5));
+    expect([], ''.searchIndex());
+    expect([], '       '.searchIndex());
+    expect([' '], ' ---------'.searchIndex(separator: '-'));
+    expect(['test'], 'test'.searchIndex(minLen: 5));
+    expect(['tes', 'test'], 'test'.searchIndex(minLen: 3).toList());
     expect(
-      [
-        'das',
-        'dash',
-        'dashx',
-      ],
-      'dashx'.createIndexes().toList(),
+      ['exam', 'examp', 'exampl', 'example', 'valu', 'value'],
+      ' example Value '.searchIndex().toList(),
     );
     expect(
-      [
-        'meh',
-        'mehm',
-        'mehme',
-        'mehmet',
-        'ese',
-        'esen',
-      ],
-      ' Mehmet Esen '.createIndexes().toList(),
+      ['a', 'quick', 'brown'],
+      ' a  quick   brown'.searchIndex(minLen: 5).toList(),
     );
     expect(
-      [
-        'le',
-        'petit',
-        'déjeu',
-        'déjeun',
-        'déjeune',
-        'déjeuner',
-      ],
-      ' le  petit    déjeuner'.createIndexes(elementLength: 5).toList(),
-    );
-    expect(
-      ['dart', 'go', 'rust&c'],
-      'dart,,,,go,rust&c'
-          .createIndexes(elementLength: 6, separator: ',')
-          .toList(),
+      ['foo', 'bar', 'baz'],
+      'foo,,,,bar,baz'.searchIndex(minLen: 6, separator: ',').toList(),
     );
   });
 }

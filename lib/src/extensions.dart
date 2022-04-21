@@ -1,18 +1,30 @@
 part of firestorex;
 
-extension StringEx on String {
+extension TextSearchEx on String {
   /// An opinionated way to handle text searches in [Firestore]
-  /// Instead bloating your model with index/query field, mutate your [toJson]
+  ///
+  /// [minLen] stands for number of minimum characters that required for search
+  /// [separator] is word separator, typically a white space
+  ///
+  /// Instead bloating your model with and extra field, mutate your [toJson]
   /// method within converter via [textSearchArray] or [textSearchMap]
+  /// Best practise example:
+  /// ```dart
+  /// final memberCollection = firestore.collection('member').withConverter<Member>(
+  ///       fromFirestore: (snapshot, options) => Member.fromJson(snapshot.data()!),
+  ///       toFirestore: (value, options) {
+  ///         return value.toJson()..['search'] = value.displayName.textSearchMap();
+  ///       },
+  ///     );
+  /// ```
   @visibleForTesting
-  Iterable<String> createIndexes(
-      {int elementLength = 3, String separator = ' '}) sync* {
-    assert(elementLength > 0, 'minimum length must be positive');
+  Iterable<String> searchIndex({int minLen = 4, String separator = ' '}) sync* {
+    assert(minLen > 1, 'minimum length must be greater than 1');
 
-    for (var s in _textSearchTune(separator)) {
-      if (s.length > elementLength) {
-        var buffer = StringBuffer(s.substring(0, elementLength - 1));
-        for (int i = elementLength - 1; i < s.length; i++) {
+    for (var s in _prepareForIndex(separator)) {
+      if (s.length > minLen) {
+        var buffer = StringBuffer(s.substring(0, minLen - 1));
+        for (int i = minLen - 1; i < s.length; i++) {
           buffer.writeCharCode(s.codeUnitAt(i));
           yield buffer.toString();
         }
@@ -25,13 +37,13 @@ extension StringEx on String {
 
   /// Eliminates empty split strings and lowercase all of them
   /// [toLowerCase()] eliminates conflicts like Turkish i-İ, English i-I
-  Iterable<String> _textSearchTune(String separator) {
+  Iterable<String> _prepareForIndex(String separator) {
     return split(separator)
         .where((e) => e.isNotEmpty)
         .map((e) => e.toLowerCase());
   }
 
-  /// For [contains] or [containsAny] text search
+  /// For [contains]/[containsAny] element
   ///
   /// Example:
   /// ```dart
@@ -51,17 +63,11 @@ extension StringEx on String {
   /// ```dart
   /// firestore.collection('objects').where('search', arrayContainsAny: [keywords]);
   /// ```
-  List<String> textSearchArray({
-    int elementLength = 3,
-    String separator = ' ',
-  }) {
-    return List<String>.from(createIndexes(
-      elementLength: elementLength,
-      separator: separator,
-    ));
+  List<String> textSearchArray({int minLen = 3, String separator = ' '}) {
+    return List<String>.from(searchIndex(minLen: minLen, separator: separator));
   }
 
-  /// For [containsAll] text search
+  /// For [containsAll] elements
   ///
   /// Example:
   /// ```dart
@@ -69,7 +75,7 @@ extension StringEx on String {
   ///   fromFirestore: (snapshot, options) => Model.fromJson(snapshot.data()!),
   ///   toFirestore: (model, options) {
   ///     return model.toJson()
-  ///       ..['search'] = model.text.textSearchMap();
+  ///       ..['search'] = model.stringValue.textSearchMap();
   ///   },
   /// );
   /// ```
@@ -83,75 +89,31 @@ extension StringEx on String {
   /// [Caution]!!! Always create nested objects for searching, otherwise you
   /// should manage your indexes. See:
   /// https://firebase.google.com/docs/firestore/solutions/index-map-field
-  Map<String, bool> textSearchMap({
-    int elementLength = 3,
-    String separator = ' ',
-  }) {
-    final indexes = createIndexes(
-      elementLength: elementLength,
-      separator: separator,
-    );
-    return {for (var element in indexes) element: true};
+  Map<String, bool> textSearchMap({int minLen = 3, String separator = ' '}) {
+    final indexes = searchIndex(minLen: minLen, separator: separator);
+    return {for (var e in indexes) e: true};
   }
 }
 
-extension IterableDocumentSnapshotEx<T> on Iterable<DocumentSnapshot<T>> {
-  Iterable<String> get docIds => map((e) => e.id);
-
-  Map<String, T> get toIdDataMap {
-    return {for (var doc in this) doc.id: doc.data()!};
-  }
-
-  Iterable<MapEntry<String, T>> get toIdDataEntries sync* {
-    for (final doc in this) {
-      yield MapEntry(doc.id, doc.data()!);
-    }
-  }
-
-  Iterable<T> get toData => map((e) => e.data()!);
+extension DocumentSnapshotsEx<T> on Iterable<DocumentSnapshot<T>> {
+  Map<String, T> get idDataMap => {for (var doc in this) doc.id: doc.data()!};
 }
 
 extension CollectionReferenceEx<T> on CollectionReference<T> {
-  Future<List<QuerySnapshot<T>>> batchDocByIds(
-    Iterable<String> ids, [
-    int subListLength = FireLimits.kMaxContains,
-  ]) {
-    return Future.wait(ids.to2D(subListLength).map((e) {
+  Future<List<QuerySnapshot<T>>> batchDocData(Iterable<String> ids) {
+    return Future.wait(ids.to2D(FireLimits.kMaxEquality).map((e) {
       return where(FieldPath.documentId, whereIn: e.toList()).get();
     }));
   }
 
-  Iterable<Stream<QuerySnapshot<T>>> batchDocSnapshotsByIds(
-    Iterable<String> ids, [
-    int subListLength = FireLimits.kMaxContains,
-  ]) {
-    return ids.to2D(subListLength).map((e) {
+  Iterable<Stream<QuerySnapshot<T>>> batchDocSnapshots(Iterable<String> ids) {
+    return ids.to2D(FireLimits.kMaxEquality).map((e) {
       return where(FieldPath.documentId, whereIn: e.toList()).snapshots();
     });
   }
 }
 
-extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
-  Iterable<String> get docIds => expand((s) => s.docs.map((d) => d.id));
-
-  Iterable<T> get toExpandedData => expand((e) => e.docs).map((e) => e.data()!);
-
-  Map<String, T> get toIdDataMap {
-    return {for (var value in expand((e) => e.docs)) value.id: value.data()!};
-  }
-}
-
-extension QuerySnapshotEx<T> on QuerySnapshot<T> {
-  Iterable<String> get docIds => docs.map((e) => e.id);
-
-  Iterable<T> get toData => docs.map((e) => e.data()!);
-
-  Map<String, T> get toIdDataMap {
-    return <String, T>{for (var doc in docs) doc.id: doc.data()!};
-  }
-}
-
-extension IterableExtensions<E> on Iterable<E> {
+extension DimensonalIterableEx<E> on Iterable<E> {
   /// [1, 2, 3, 4, 5, 6].convertTo2D(2) == [[1, 2], [3, 4], [5, 6]]
   /// [1, 2, 3, 4].convertTo2D(3) == [[1, 2, 3], [4]]
   Iterable<List<E>> to2D(int div) sync* {
@@ -162,6 +124,8 @@ extension IterableExtensions<E> on Iterable<E> {
       for (int i = 0; i < div - 1; i++) {
         if (iterator.moveNext()) {
           subArray.add(iterator.current);
+        } else {
+          break;
         }
       }
       yield subArray;

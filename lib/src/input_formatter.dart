@@ -20,7 +20,7 @@ class FirestoreSearchFormatter extends TextInputFormatter {
       return oldValue;
     }
     if (newText.endsWith(separator)) {
-      if (newText._textSearchTune(separator).length == length) {
+      if (newText._prepareForIndex(separator).length == length) {
         return oldValue;
       }
     }

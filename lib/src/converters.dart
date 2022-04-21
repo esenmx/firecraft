@@ -5,7 +5,11 @@ class DateTimeTimestampConv implements JsonConverter<DateTime, dynamic> {
 
   @override
   DateTime fromJson(dynamic value) {
-    assert(value is Timestamp);
+    assert(
+      value is Timestamp,
+      'A non-null Timestamp value assertion failed.'
+      'If your field is nullable, you must use NullDateTimeTimestampConv',
+    );
     return (value as Timestamp).toDate();
   }
 
@@ -14,7 +18,7 @@ class DateTimeTimestampConv implements JsonConverter<DateTime, dynamic> {
     if (value == FireFlags.serverDateTime) {
       return FieldValue.serverTimestamp();
     }
-    return Timestamp.fromDate(value.toUtc());
+    return Timestamp.fromDate(value);
   }
 }
 
@@ -23,7 +27,10 @@ class NullDateTimeTimestampConv implements JsonConverter<DateTime?, dynamic> {
 
   @override
   DateTime? fromJson(dynamic value) {
-    assert(value == null || value is Timestamp);
+    assert(
+      value == null || value is Timestamp,
+      'A non Timestamp value returned',
+    );
     return (value as Timestamp?)?.toDate();
   }
 
@@ -32,6 +39,6 @@ class NullDateTimeTimestampConv implements JsonConverter<DateTime?, dynamic> {
     if (value == FireFlags.serverDateTime) {
       return FieldValue.serverTimestamp();
     }
-    return value == null ? null : Timestamp.fromDate(value.toUtc());
+    return value == null ? null : Timestamp.fromDate(value);
   }
 }
