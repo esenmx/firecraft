@@ -113,6 +113,16 @@ extension CollectionReferenceEx<T> on CollectionReference<T> {
   }
 }
 
+extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
+  Iterable<String> get ids => expand((s) => s.docs.map((d) => d.id));
+
+  Iterable<T> get data => expand((e) => e.docs).map((e) => e.data()!);
+
+  Map<String, T> get idDataMap {
+    return {for (var value in expand((e) => e.docs)) value.id: value.data()!};
+  }
+}
+
 extension DimensonalIterableEx<E> on Iterable<E> {
   /// [1, 2, 3, 4, 5, 6].convertTo2D(2) == [[1, 2], [3, 4], [5, 6]]
   /// [1, 2, 3, 4].convertTo2D(3) == [[1, 2, 3], [4]]
