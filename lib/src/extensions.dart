@@ -96,17 +96,29 @@ extension TextSearchEx on String {
 }
 
 extension DocumentSnapshotsEx<T> on Iterable<DocumentSnapshot<T>> {
+  Set<String> get idSet => {for (var doc in this) doc.id};
+
+  Set<T> get dataSet => {for (var doc in this) doc.data()!};
+
   Map<String, T> get idDataMap => {for (var doc in this) doc.id: doc.data()!};
 }
 
+extension QuerySnapshotEx<T> on QuerySnapshot<T> {
+  Set<String> get idSet => docs.idSet;
+
+  Set<T> get dataSet => docs.dataSet;
+
+  Map<String, T> get idDataMap => docs.idDataMap;
+}
+
 extension CollectionReferenceEx<T> on CollectionReference<T> {
-  Future<List<QuerySnapshot<T>>> batchDocData(Iterable<String> ids) {
+  Future<List<QuerySnapshot<T>>> batchGet(Set<String> ids) {
     return Future.wait(ids.to2D(FireLimits.kMaxEquality).map((e) {
       return where(FieldPath.documentId, whereIn: e.toList()).get();
     }));
   }
 
-  Iterable<Stream<QuerySnapshot<T>>> batchDocSnapshots(Iterable<String> ids) {
+  Iterable<Stream<QuerySnapshot<T>>> batchSnapshots(Set<String> ids) {
     return ids.to2D(FireLimits.kMaxEquality).map((e) {
       return where(FieldPath.documentId, whereIn: e.toList()).snapshots();
     });
@@ -114,9 +126,9 @@ extension CollectionReferenceEx<T> on CollectionReference<T> {
 }
 
 extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
-  Iterable<String> get ids => expand((s) => s.docs.map((d) => d.id));
+  Iterable<String> get ids => expand((s) => s.docs.idSet);
 
-  Iterable<T> get data => expand((e) => e.docs).map((e) => e.data()!);
+  Iterable<T> get data => expand((e) => e.docs.dataSet);
 
   Map<String, T> get idDataMap {
     return {for (var value in expand((e) => e.docs)) value.id: value.data()!};
@@ -124,8 +136,8 @@ extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
 }
 
 extension DimensonalIterableEx<E> on Iterable<E> {
-  /// [1, 2, 3, 4, 5, 6].convertTo2D(2) == [[1, 2], [3, 4], [5, 6]]
-  /// [1, 2, 3, 4].convertTo2D(3) == [[1, 2, 3], [4]]
+  /// [1, 2, 3, 4, 5, 6].convertTo2D(2) // [[1, 2], [3, 4], [5, 6]]
+  /// [1, 2, 3, 4].convertTo2D(3) // [[1, 2, 3], [4]]
   Iterable<List<E>> to2D(int div) sync* {
     RangeError.range(div, 1, 1 << 31);
     final iterator = this.iterator;
