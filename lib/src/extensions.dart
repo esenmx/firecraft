@@ -111,36 +111,6 @@ extension QuerySnapshotEx<T> on QuerySnapshot<T> {
   Map<String, T> idDataMap() => docs.idDataMap();
 }
 
-extension CollectionReferenceEx<T> on CollectionReference<T> {
-  Future<List<QuerySnapshot<T>>> batchDocGet(Set<String> docIds) {
-    if (docIds.isEmpty) {
-      return Future.value(List.empty());
-    }
-    if (docIds.length <= FireLimits.kMaxEquality) {
-      return where(FieldPath.documentId, whereIn: docIds.toList())
-          .get()
-          .then((value) => [value]);
-    }
-    return Future.wait(docIds.to2D(FireLimits.kMaxEquality).map((e) {
-      return where(FieldPath.documentId, whereIn: e.toList()).get();
-    }));
-  }
-
-  Iterable<Stream<QuerySnapshot<T>>> batchDocSnapshots(Set<String> docIds) {
-    if (docIds.isEmpty) {
-      return const Iterable.empty();
-    }
-    if (docIds.length <= FireLimits.kMaxEquality) {
-      return [
-        where(FieldPath.documentId, whereIn: docIds.toList()).snapshots()
-      ];
-    }
-    return docIds.to2D(FireLimits.kMaxEquality).map((e) {
-      return where(FieldPath.documentId, whereIn: e.toList()).snapshots();
-    });
-  }
-}
-
 extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
   Iterable<String> ids() => expand((s) => s.docs.idSet());
 
@@ -148,6 +118,28 @@ extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
 
   Map<String, T> idDataMap() {
     return {for (var value in expand((e) => e.docs)) value.id: value.data()!};
+  }
+}
+
+extension CollectionReferenceEx<T> on CollectionReference<T> {
+  Future<List<QuerySnapshot<T>>> docsGet(Set<String> docIds) {
+    if (docIds.length <= FireLimits.kMaxEqualityOrContains) {
+      final query = where(FieldPath.documentId, whereIn: docIds.toList());
+      return query.get().then((value) => [value]);
+    }
+    return Future.wait(docIds.to2D(FireLimits.kMaxEqualityOrContains).map((e) {
+      return where(FieldPath.documentId, whereIn: e.toList()).get();
+    }));
+  }
+
+  Iterable<Stream<QuerySnapshot<T>>> docsSnapshots(Set<String> docIds) {
+    if (docIds.length <= FireLimits.kMaxEqualityOrContains) {
+      final query = where(FieldPath.documentId, whereIn: docIds.toList());
+      return [query.snapshots()];
+    }
+    return docIds.to2D(FireLimits.kMaxEqualityOrContains).map((e) {
+      return where(FieldPath.documentId, whereIn: e.toList()).snapshots();
+    });
   }
 }
 

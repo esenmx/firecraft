@@ -1,14 +1,14 @@
 part of firestorex;
 
-class DateTimeTimestampConv implements JsonConverter<DateTime, dynamic> {
-  const DateTimeTimestampConv();
+class TimestampConv implements JsonConverter<DateTime, dynamic> {
+  const TimestampConv();
 
   @override
   DateTime fromJson(dynamic value) {
     assert(
       value is Timestamp,
       'A non-null Timestamp value assertion failed.'
-      'If your field is nullable, you must use NullDateTimeTimestampConv',
+      'If your field is nullable, you must use NullTimestampConv',
     );
     return (value as Timestamp).toDate();
   }
@@ -22,8 +22,8 @@ class DateTimeTimestampConv implements JsonConverter<DateTime, dynamic> {
   }
 }
 
-class NullDateTimeTimestampConv implements JsonConverter<DateTime?, dynamic> {
-  const NullDateTimeTimestampConv();
+class NullTimestampConv implements JsonConverter<DateTime?, dynamic> {
+  const NullTimestampConv();
 
   @override
   DateTime? fromJson(dynamic value) {

@@ -6,9 +6,9 @@ import 'package:rand/rand.dart';
 void main() async {
   final fake = FakeFirebaseFirestore();
   final collection = fake.collection('test');
-  group('DateTimeTimestampConv', () {
-    final toJson = const DateTimeTimestampConv().toJson;
-    final fromJson = const DateTimeTimestampConv().fromJson;
+  group('TimestampConv', () {
+    final toJson = const TimestampConv().toJson;
+    final fromJson = const TimestampConv().fromJson;
 
     test('fromJson(null) error', () {
       expect(() => fromJson(null), throwsA(isA<AssertionError>()));
@@ -41,9 +41,9 @@ void main() async {
     });
   });
 
-  group('NullDateTimeTimestampConv', () {
-    final toJson = const NullDateTimeTimestampConv().toJson;
-    final fromJson = const NullDateTimeTimestampConv().fromJson;
+  group('NullTimestampConv', () {
+    final toJson = const NullTimestampConv().toJson;
+    final fromJson = const NullTimestampConv().fromJson;
 
     test('null value', () async {
       final doc = collection.doc();

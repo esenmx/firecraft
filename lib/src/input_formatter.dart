@@ -4,19 +4,19 @@ part of firestorex;
 class FirestoreSearchFormatter extends TextInputFormatter {
   FirestoreSearchFormatter({
     this.separator = ' ',
-    this.length = FireLimits.kMaxEquality,
+    this.length = FireLimits.kMaxEqualityOrContains,
   });
 
   final String separator;
   final int length;
 
   @override
-  formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(oldValue, newValue) {
     final newText = newValue.text;
     if (newText.startsWith(separator)) {
       return oldValue;
     }
-    if (newText.endsWith(separator + separator)) {
+    if (newText.endsWith('$separator$separator')) {
       return oldValue;
     }
     if (newText.endsWith(separator)) {
