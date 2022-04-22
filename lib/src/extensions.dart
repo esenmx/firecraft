@@ -112,28 +112,30 @@ extension QuerySnapshotEx<T> on QuerySnapshot<T> {
 }
 
 extension CollectionReferenceEx<T> on CollectionReference<T> {
-  Future<List<QuerySnapshot<T>>> batchGet(Set<String> ids) {
-    if (ids.isEmpty) {
+  Future<List<QuerySnapshot<T>>> batchDocGet(Set<String> docIds) {
+    if (docIds.isEmpty) {
       return Future.value(List.empty());
     }
-    if (ids.length <= FireLimits.kMaxEquality) {
-      return where(FieldPath.documentId, whereIn: ids.toList())
+    if (docIds.length <= FireLimits.kMaxEquality) {
+      return where(FieldPath.documentId, whereIn: docIds.toList())
           .get()
           .then((value) => [value]);
     }
-    return Future.wait(ids.to2D(FireLimits.kMaxEquality).map((e) {
+    return Future.wait(docIds.to2D(FireLimits.kMaxEquality).map((e) {
       return where(FieldPath.documentId, whereIn: e.toList()).get();
     }));
   }
 
-  Iterable<Stream<QuerySnapshot<T>>> batchSnapshots(Set<String> ids) {
-    if (ids.isEmpty) {
+  Iterable<Stream<QuerySnapshot<T>>> batchDocSnapshots(Set<String> docIds) {
+    if (docIds.isEmpty) {
       return const Iterable.empty();
     }
-    if (ids.length <= FireLimits.kMaxEquality) {
-      return [where(FieldPath.documentId, whereIn: ids.toList()).snapshots()];
+    if (docIds.length <= FireLimits.kMaxEquality) {
+      return [
+        where(FieldPath.documentId, whereIn: docIds.toList()).snapshots()
+      ];
     }
-    return ids.to2D(FireLimits.kMaxEquality).map((e) {
+    return docIds.to2D(FireLimits.kMaxEquality).map((e) {
       return where(FieldPath.documentId, whereIn: e.toList()).snapshots();
     });
   }
