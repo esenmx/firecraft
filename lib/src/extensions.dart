@@ -96,19 +96,19 @@ extension TextSearchEx on String {
 }
 
 extension DocumentSnapshotsEx<T> on Iterable<DocumentSnapshot<T>> {
-  Set<String> get idSet => {for (var doc in this) doc.id};
+  Set<String> idSet() => {for (var doc in this) doc.id};
 
-  Set<T> get dataSet => {for (var doc in this) doc.data()!};
+  Set<T> dataSet() => {for (var doc in this) doc.data()!};
 
-  Map<String, T> get idDataMap => {for (var doc in this) doc.id: doc.data()!};
+  Map<String, T> idDataMap() => {for (var doc in this) doc.id: doc.data()!};
 }
 
 extension QuerySnapshotEx<T> on QuerySnapshot<T> {
-  Set<String> get idSet => docs.idSet;
+  Set<String> idSet() => docs.idSet();
 
-  Set<T> get dataSet => docs.dataSet;
+  Set<T> dataSet() => docs.dataSet();
 
-  Map<String, T> get idDataMap => docs.idDataMap;
+  Map<String, T> idDataMap() => docs.idDataMap();
 }
 
 extension CollectionReferenceEx<T> on CollectionReference<T> {
@@ -142,11 +142,11 @@ extension CollectionReferenceEx<T> on CollectionReference<T> {
 }
 
 extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
-  Iterable<String> get ids => expand((s) => s.docs.idSet);
+  Iterable<String> ids() => expand((s) => s.docs.idSet());
 
-  Iterable<T> get data => expand((e) => e.docs.dataSet);
+  Iterable<T> data() => expand((e) => e.docs.dataSet());
 
-  Map<String, T> get idDataMap {
+  Map<String, T> idDataMap() {
     return {for (var value in expand((e) => e.docs)) value.id: value.data()!};
   }
 }
