@@ -1,5 +1,8 @@
 part of firestorex;
 
+const timestampConv = TimestampConv();
+
+@visibleForTesting
 class TimestampConv implements JsonConverter<DateTime, dynamic> {
   const TimestampConv();
 
@@ -22,6 +25,9 @@ class TimestampConv implements JsonConverter<DateTime, dynamic> {
   }
 }
 
+const nullTimestampConv = NullTimestampConv();
+
+@visibleForTesting
 class NullTimestampConv implements JsonConverter<DateTime?, dynamic> {
   const NullTimestampConv();
 

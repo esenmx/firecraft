@@ -95,6 +95,50 @@ extension TextSearchEx on String {
   }
 }
 
+///
+/// Useful if you have locale database([Sqlite], [SharedPreferences], [Hive] etc...)
+/// Store queried documents with [timestamp] field so when you query again
+/// A typical query would be:
+/// ```dart
+/// collection.where('timestamp', isGreaterThan: collectionObject.timestamp);
+/// ```
+/// Only newer documents will be queried by doing so
+///
+/// Grabbing [timestamp] from [DocumentSnapshot] depends on you
+///
+extension FirestoreEx on FirebaseFirestore {
+  CollectionReference<R> cachedCollection<R>({
+    required String path,
+    required FirestoreFromJson<R> fromJson,
+    required FirestoreToJson<R> toJson,
+    required FirestoreCacheHandler cacheHandler,
+    String timestampKey = 'timestamp',
+  }) {
+    return collection(path).withConverter<R>(
+      fromFirestore: (snapshot, _) {
+        final data = snapshot.data()!;
+        if (data.containsKey(timestampKey)) {
+          cacheHandler(snapshot.id, timestampConv.fromJson(data[timestampKey]));
+        }
+        return fromJson(data);
+      },
+      toFirestore: (R value, _) {
+        final json = toJson(value);
+        assert(
+          !json.containsKey(timestampKey),
+          '$timestampKey jsonKey occupied or '
+          'you are explicitly assigning $timestampKey which is totally unneeded',
+        );
+        return json..[timestampKey] = FieldValue.serverTimestamp();
+      },
+    );
+  }
+}
+
+typedef FirestoreCacheHandler = void Function(String docId, DateTime timestamp);
+typedef FirestoreFromJson<R> = R Function(Map<String, dynamic> json);
+typedef FirestoreToJson<R> = Map<String, Object?> Function(R value);
+
 extension DocumentSnapshotsEx<T> on Iterable<DocumentSnapshot<T>> {
   Set<String> idSet() => {for (var doc in this) doc.id};
 
