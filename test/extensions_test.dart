@@ -17,7 +17,7 @@ class Entity {
 }
 
 class CacheHandlerMock extends Mock {
-  void call(String docId, DateTime? timestamp);
+  void call(String? id, Entity? value, DateTime? timestamp);
 }
 
 void main() async {
@@ -42,22 +42,22 @@ void main() async {
   });
 
   test('cachedCollection', () async {
-    var entity = Entity(FireFlags.serverDateTime);
+    final entity = Entity(FireFlags.serverDateTime);
     final cacheHandler = CacheHandlerMock();
     DateTime? timestamp;
     final collection = FakeFirebaseFirestore().cachedCollection<Entity>(
       path: 'test',
       fromJson: (json) => Entity.fromJson(json),
       toJson: (val) => val.toJson(),
-      cacheHandler: (id, ts) {
+      cacheHandler: (id, val, ts) {
         timestamp = ts;
-        return cacheHandler(id, ts);
+        return cacheHandler(id, val, ts);
       },
     );
     final doc = collection.doc();
     await doc.set(entity);
-    entity = await doc.get().then((value) => value.data()!);
-    verify(cacheHandler(doc.id, any)).called(2);
-    expect(entity.timestamp, equals(timestamp));
+    final snapshot = await doc.get();
+    verify(cacheHandler(snapshot.id, snapshot.data()!, any)).called(1);
+    expect(snapshot.data()!.timestamp, equals(timestamp));
   });
 }

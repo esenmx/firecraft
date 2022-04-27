@@ -110,16 +110,18 @@ extension FirestoreEx on FirebaseFirestore {
     required String path,
     required FirestoreFromJson<R> fromJson,
     required FirestoreToJson<R> toJson,
-    required FirestoreCacheHandler cacheHandler,
+    required FirestoreCacheHandler<R> cacheHandler,
     String timestampKey = 'timestamp',
   }) {
     return collection(path).withConverter<R>(
       fromFirestore: (snapshot, _) {
         final data = snapshot.data()!;
+        final value = fromJson(data);
         if (data.containsKey(timestampKey)) {
-          cacheHandler(snapshot.id, timestampConv.fromJson(data[timestampKey]));
+          final ts = timestampConv.fromJson(data[timestampKey]);
+          cacheHandler(snapshot.id, value, ts);
         }
-        return fromJson(data);
+        return value;
       },
       toFirestore: (R value, _) {
         final json = toJson(value);
@@ -134,9 +136,17 @@ extension FirestoreEx on FirebaseFirestore {
   }
 }
 
-typedef FirestoreCacheHandler = void Function(String docId, DateTime timestamp);
-typedef FirestoreFromJson<R> = R Function(Map<String, dynamic> json);
-typedef FirestoreToJson<R> = Map<String, Object?> Function(R value);
+typedef FirestoreCacheHandler<R> = void Function(
+  String docId,
+  R value,
+  DateTime timestamp,
+);
+typedef FirestoreFromJson<R> = R Function(
+  Map<String, dynamic> json,
+);
+typedef FirestoreToJson<R> = Map<String, Object?> Function(
+  R value,
+);
 
 extension DocumentSnapshotsEx<T> on Iterable<DocumentSnapshot<T>> {
   Set<String> idSet() => {for (var doc in this) doc.id};
