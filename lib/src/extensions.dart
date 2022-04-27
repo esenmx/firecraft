@@ -96,15 +96,14 @@ extension TextSearchEx on String {
 }
 
 ///
-/// Useful if you have locale database([Sqlite], [SharedPreferences], [Hive] etc...)
-/// Store queried documents with [timestamp] field so when you query again
+/// Useful if you have local database([Sqlite], [SharedPreferences], [Hive] etc...).
+/// Store queried documents with [timestamp] field so when you query again.
 /// A typical query would be:
 /// ```dart
 /// collection.where('timestamp', isGreaterThan: collectionObject.timestamp);
 /// ```
-/// Only newer documents will be queried by doing so
-///
-/// Grabbing [timestamp] from [DocumentSnapshot] depends on you
+/// Only newer documents will be queried by doing so.
+/// [cacheHandler] callback will let you manipulate your local database
 ///
 extension FirestoreEx on FirebaseFirestore {
   CollectionReference<R> cachedCollection<R>({
@@ -188,8 +187,8 @@ extension CollectionReferenceEx<T> on CollectionReference<T> {
 }
 
 extension DimensonalIterableEx<E> on Iterable<E> {
-  /// [1, 2, 3, 4, 5, 6].convertTo2D(2) // [[1, 2], [3, 4], [5, 6]]
-  /// [1, 2, 3, 4].convertTo2D(3) // [[1, 2, 3], [4]]
+  /// [1, 2, 3, 4, 5, 6].convertTo2D(2) => [[1, 2], [3, 4], [5, 6]]
+  /// [1, 2, 3, 4].convertTo2D(3) => [[1, 2, 3], [4]]
   Iterable<List<E>> to2D(int div) sync* {
     RangeError.range(div, 1, 1 << 31);
     final iterator = this.iterator;
