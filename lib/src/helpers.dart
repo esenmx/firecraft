@@ -2,7 +2,7 @@ part of firestorex;
 
 /// https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
 abstract class FireLimits {
-  static const int kMaxEqualityOrContains = 10;
+  static const int kMaxEquality = 10;
 }
 
 abstract class FireFlags {

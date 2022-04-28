@@ -3,23 +3,6 @@ import 'package:firestorex/firestorex.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
-class Entity {
-  /// for [CacheHandlerMock]
-  final DateTime timestamp;
-
-  Entity(this.timestamp);
-
-  factory Entity.fromJson(Map<String, dynamic> json) {
-    return Entity(timestampConv.fromJson(json['timestamp']));
-  }
-
-  Map<String, Object?> toJson() => {};
-}
-
-class CacheHandlerMock extends Mock {
-  void call(String? id, Entity? value, DateTime? timestamp);
-}
-
 void main() async {
   test('createIndexes', () {
     expect([], ''.searchIndex());
@@ -55,9 +38,29 @@ void main() async {
       },
     );
     final doc = collection.doc();
+    await doc.get();
+    verifyNever(cacheHandler(doc.id, any, any));
     await doc.set(entity);
-    final snapshot = await doc.get();
-    verify(cacheHandler(snapshot.id, snapshot.data()!, any)).called(1);
-    expect(snapshot.data()!.timestamp, equals(timestamp));
+    verify(cacheHandler(doc.id, any, any)).called(1); // irrelevant, fake
+    Entity? data = await doc.get().then((value) => value.data());
+    verify(cacheHandler(doc.id, any, any)).called(1);
+    expect(data!.timestamp, equals(timestamp));
   });
+}
+
+class Entity {
+  /// for [CacheHandlerMock]
+  final DateTime timestamp;
+
+  Entity(this.timestamp);
+
+  factory Entity.fromJson(Map<String, dynamic> json) {
+    return Entity(timestampConv.fromJson(json['timestamp']));
+  }
+
+  Map<String, Object?> toJson() => {};
+}
+
+class CacheHandlerMock extends Mock {
+  void call(String? id, Entity? value, DateTime? timestamp);
 }

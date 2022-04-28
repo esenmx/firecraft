@@ -105,6 +105,7 @@ extension TextSearchEx on String {
 /// Only newer documents will be queried by doing so.
 /// [cacheHandler] callback will let you manipulate your local database
 ///
+/// todo delete handler
 extension FirestoreEx on FirebaseFirestore {
   CollectionReference<R> cachedCollection<R>({
     required String path,
@@ -127,12 +128,18 @@ extension FirestoreEx on FirebaseFirestore {
         final json = toJson(value);
         assert(
           !json.containsKey(timestampKey),
-          '$timestampKey jsonKey occupied or '
-          'you are explicitly assigning $timestampKey which is totally unneeded',
+          '`$timestampKey` json key occupied',
         );
         return json..[timestampKey] = FieldValue.serverTimestamp();
       },
     );
+  }
+}
+
+extension DocumentReferenceEx<R> on DocumentReference<R> {
+  Future<void> cachedDelete() async {
+    // todo
+    throw UnimplementedError();
   }
 }
 
@@ -141,12 +148,12 @@ typedef FirestoreCacheHandler<R> = void Function(
   R value,
   DateTime timestamp,
 );
-typedef FirestoreFromJson<R> = R Function(
-  Map<String, dynamic> json,
+typedef FirestoreCacheDeleter<R> = void Function(
+  String docId,
+  DateTime timestamp,
 );
-typedef FirestoreToJson<R> = Map<String, Object?> Function(
-  R value,
-);
+typedef FirestoreFromJson<R> = R Function(Map<String, dynamic> json);
+typedef FirestoreToJson<R> = Map<String, Object?> Function(R value);
 
 extension DocumentSnapshotsEx<T> on Iterable<DocumentSnapshot<T>> {
   Set<String> idSet() => {for (var doc in this) doc.id};
@@ -176,21 +183,21 @@ extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
 
 extension CollectionReferenceEx<T> on CollectionReference<T> {
   Future<List<QuerySnapshot<T>>> docsGet(Set<String> docIds) {
-    if (docIds.length <= FireLimits.kMaxEqualityOrContains) {
+    if (docIds.length <= FireLimits.kMaxEquality) {
       final query = where(FieldPath.documentId, whereIn: docIds.toList());
       return query.get().then((value) => [value]);
     }
-    return Future.wait(docIds.to2D(FireLimits.kMaxEqualityOrContains).map((e) {
+    return Future.wait(docIds.to2D(FireLimits.kMaxEquality).map((e) {
       return where(FieldPath.documentId, whereIn: e.toList()).get();
     }));
   }
 
   Iterable<Stream<QuerySnapshot<T>>> docsSnapshots(Set<String> docIds) {
-    if (docIds.length <= FireLimits.kMaxEqualityOrContains) {
+    if (docIds.length <= FireLimits.kMaxEquality) {
       final query = where(FieldPath.documentId, whereIn: docIds.toList());
       return [query.snapshots()];
     }
-    return docIds.to2D(FireLimits.kMaxEqualityOrContains).map((e) {
+    return docIds.to2D(FireLimits.kMaxEquality).map((e) {
       return where(FieldPath.documentId, whereIn: e.toList()).snapshots();
     });
   }
