@@ -1,16 +1,27 @@
 part of firestorex;
 
-///
-typedef Document<T extends Object> = MapEntry<String, T>;
+/// As of [freezed] 2.0, collections are unmodifiable by default.
+/// To work with collections with effectively, you can use this extensions methods.
+/// Methods with [copy] prefix means, it returns copy of itself(just like copyWith).
 
-///
-typedef DocumentMap<T extends Object> = Map<String, T>;
-
-///
-typedef SequenceMap<T extends Object> = Map<int, T>;
-
-extension DataIterableEx<T extends Object> on Iterable<T> {
-  SequenceMap<T> toSequenceMap() {
-    return {for (int i = 0; i < length; i++) i: elementAt(i)};
+extension UnmodifiableMapX<K, V> on Map<K, V> {
+  Map<K, V> copyRemove(K id) {
+    return {
+      for (var k in keys)
+        if (k != id) k: this[k]!
+    };
   }
+
+  Map<K, V> copySet(K k, V v) => {...this, k: v};
+}
+
+extension UnmodifiableListX<E> on List<E> {
+  List<E> copyRemoveAt(int index) {
+    return [
+      for (int i = 0; i < length; i++)
+        if (i != index) elementAt(i)
+    ];
+  }
+
+  List<E> copyAdd(E e) => [...this, e];
 }

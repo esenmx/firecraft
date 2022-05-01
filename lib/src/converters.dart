@@ -17,7 +17,7 @@ class TimestampConv implements JsonConverter<DateTime, dynamic> {
 
   @override
   dynamic toJson(DateTime value) {
-    if (value == FireFlags.serverDateTime) {
+    if (value == kServerTimestampSentinel) {
       return FieldValue.serverTimestamp();
     }
     return Timestamp.fromDate(value);
@@ -40,7 +40,7 @@ class NullTimestampConv implements JsonConverter<DateTime?, dynamic> {
 
   @override
   dynamic toJson(DateTime? value) {
-    if (value == FireFlags.serverDateTime) {
+    if (value == kServerTimestampSentinel) {
       return FieldValue.serverTimestamp();
     }
     return value == null ? null : Timestamp.fromDate(value);

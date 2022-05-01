@@ -25,7 +25,7 @@ void main() async {
   });
 
   test('cachedCollection', () async {
-    final entity = Entity(FireFlags.serverDateTime);
+    final entity = Entity(kServerTimestampSentinel);
     final cacheHandler = CacheHandlerMock();
     DateTime? timestamp;
     final collection = FakeFirebaseFirestore().cachedCollection<Entity>(

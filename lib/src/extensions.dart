@@ -1,6 +1,6 @@
 part of firestorex;
 
-extension TextSearchEx on String {
+extension TextSearchX on String {
   /// An opinionated way to handle text searches in [Firestore]
   ///
   /// [minLen] stands for number of minimum characters that required for search
@@ -106,7 +106,7 @@ extension TextSearchEx on String {
 /// [cacheHandler] callback will let you manipulate your local database
 ///
 /// todo delete handler
-extension FirestoreEx on FirebaseFirestore {
+extension FirestoreX on FirebaseFirestore {
   CollectionReference<R> cachedCollection<R>({
     required String path,
     required FirestoreFromJson<R> fromJson,
@@ -155,7 +155,7 @@ typedef FirestoreCacheDeleter<R> = void Function(
 typedef FirestoreFromJson<R> = R Function(Map<String, dynamic> json);
 typedef FirestoreToJson<R> = Map<String, Object?> Function(R value);
 
-extension DocumentSnapshotsEx<T> on Iterable<DocumentSnapshot<T>> {
+extension DocumentSnapshotsEx<T> on List<DocumentSnapshot<T>> {
   Set<String> idSet() => {for (var doc in this) doc.id};
 
   Set<T> dataSet() => {for (var doc in this) doc.data()!};
@@ -169,56 +169,4 @@ extension QuerySnapshotEx<T> on QuerySnapshot<T> {
   Set<T> dataSet() => docs.dataSet();
 
   Map<String, T> idDataMap() => docs.idDataMap();
-}
-
-extension IterableQuerySnapshotEx<T> on Iterable<QuerySnapshot<T>> {
-  Iterable<String> ids() => expand((s) => s.docs.idSet());
-
-  Iterable<T> data() => expand((e) => e.docs.dataSet());
-
-  Map<String, T> idDataMap() {
-    return {for (var value in expand((e) => e.docs)) value.id: value.data()!};
-  }
-}
-
-extension CollectionReferenceEx<T> on CollectionReference<T> {
-  Future<List<QuerySnapshot<T>>> docsGet(Set<String> docIds) {
-    if (docIds.length <= FireLimits.kMaxEquality) {
-      final query = where(FieldPath.documentId, whereIn: docIds.toList());
-      return query.get().then((value) => [value]);
-    }
-    return Future.wait(docIds.to2D(FireLimits.kMaxEquality).map((e) {
-      return where(FieldPath.documentId, whereIn: e.toList()).get();
-    }));
-  }
-
-  Iterable<Stream<QuerySnapshot<T>>> docsSnapshots(Set<String> docIds) {
-    if (docIds.length <= FireLimits.kMaxEquality) {
-      final query = where(FieldPath.documentId, whereIn: docIds.toList());
-      return [query.snapshots()];
-    }
-    return docIds.to2D(FireLimits.kMaxEquality).map((e) {
-      return where(FieldPath.documentId, whereIn: e.toList()).snapshots();
-    });
-  }
-}
-
-extension DimensonalIterableEx<E> on Iterable<E> {
-  /// [1, 2, 3, 4, 5, 6].convertTo2D(2) => [[1, 2], [3, 4], [5, 6]]
-  /// [1, 2, 3, 4].convertTo2D(3) => [[1, 2, 3], [4]]
-  Iterable<List<E>> to2D(int div) sync* {
-    RangeError.range(div, 1, 1 << 31);
-    final iterator = this.iterator;
-    while (iterator.moveNext()) {
-      final subArray = <E>[iterator.current];
-      for (int i = 0; i < div - 1; i++) {
-        if (iterator.moveNext()) {
-          subArray.add(iterator.current);
-        } else {
-          break;
-        }
-      }
-      yield subArray;
-    }
-  }
 }
