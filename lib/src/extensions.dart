@@ -96,8 +96,9 @@ extension TextSearchX on String {
 }
 
 ///
-/// Useful if you have local database([Sqlite], [SharedPreferences], [Hive] etc...).
-/// Store queried documents with [timestamp] field so when you query again.
+/// Collection for querying based on [updatedAt] field, also essential if you
+/// are caching with local database([Sqlite], [SharedPreferences], [Hive] etc...).
+/// Store queried documents with [dateTime] field so when you query again.
 /// A typical query would be:
 /// ```dart
 /// collection.where('timestamp', isGreaterThan: collectionObject.timestamp);
@@ -118,7 +119,7 @@ extension FirestoreX on FirebaseFirestore {
       fromFirestore: (snapshot, _) {
         final data = snapshot.data()!;
         final value = fromJson(data);
-        if (data.containsKey(timestampKey)) {
+        if (data[timestampKey] != null) {
           final ts = timestampConv.fromJson(data[timestampKey]);
           cacheHandler(snapshot.id, value, ts);
         }
@@ -126,10 +127,7 @@ extension FirestoreX on FirebaseFirestore {
       },
       toFirestore: (R value, _) {
         final json = toJson(value);
-        assert(
-          !json.containsKey(timestampKey),
-          '`$timestampKey` json key occupied',
-        );
+        assert(!json.containsKey(timestampKey), '$timestampKey key occupied');
         return json..[timestampKey] = FieldValue.serverTimestamp();
       },
     );
@@ -138,7 +136,7 @@ extension FirestoreX on FirebaseFirestore {
 
 extension DocumentReferenceEx<R> on DocumentReference<R> {
   Future<void> cachedDelete() async {
-    // todo
+    // TODO
     throw UnimplementedError();
   }
 }

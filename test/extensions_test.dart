@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firestorex/firestorex.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:test_utils/test_utils.dart';
 
 void main() async {
   test('createIndexes', () {
@@ -24,43 +25,30 @@ void main() async {
     );
   });
 
-  test('cachedCollection', () async {
-    final entity = Entity(kServerTimestampSentinel);
-    final cacheHandler = CacheHandlerMock();
-    DateTime? timestamp;
+  testWidgets('cachedCollection', (t) async {
     final collection = FakeFirebaseFirestore().cachedCollection<Entity>(
       path: 'test',
       fromJson: (json) => Entity.fromJson(json),
       toJson: (val) => val.toJson(),
       cacheHandler: (id, val, ts) {
-        timestamp = ts;
-        return cacheHandler(id, val, ts);
+        const d = Duration(milliseconds: 1); // may vary depend on machine
+        expect(val.dateTime.withinDuration(ts, d), isTrue);
       },
     );
-    final doc = collection.doc();
-    await doc.get();
-    verifyNever(cacheHandler(doc.id, any, any));
-    await doc.set(entity);
-    verify(cacheHandler(doc.id, any, any)).called(1); // irrelevant, fake
-    Entity? data = await doc.get().then((value) => value.data());
-    verify(cacheHandler(doc.id, any, any)).called(1);
-    expect(data!.timestamp, equals(timestamp));
+    for (int i = 0; i < 1000; i++) {
+      collection.add(Entity(kServerTimestampSentinel));
+    }
   });
 }
 
 class Entity {
-  /// for [CacheHandlerMock]
-  final DateTime timestamp;
+  final DateTime dateTime;
 
-  Entity(this.timestamp);
+  Entity(this.dateTime);
 
   factory Entity.fromJson(Map<String, dynamic> json) {
-    return Entity(timestampConv.fromJson(json['timestamp']));
+    return Entity(timestampConv.fromJson(json['dateTime']));
   }
 
-  Map<String, Object?> toJson() => {};
-}
-
-class CacheHandlerMock extends Mock {
-  void call(String? id, Entity? value, DateTime? timestamp);
+  Map<String, Object?> toJson() => {'dateTime': FieldValue.serverTimestamp()};
 }
