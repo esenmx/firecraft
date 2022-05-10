@@ -13,6 +13,10 @@ extension UnmodifiableMapX<K, V> on Map<K, V> {
   }
 
   Map<K, V> copySet(K k, V v) => {...this, k: v};
+
+  Map<K, V> copySetBatch(Iterable<MapEntry<K, V>> entries) {
+    return {...this, for (var e in entries) e.key: e.value};
+  }
 }
 
 extension UnmodifiableListX<E> on List<E> {
