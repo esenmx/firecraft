@@ -1,5 +1,27 @@
 part of firestorex;
 
+/// For reducing line width and speeding up the writing. Think about this example:
+/// ```dart
+/// @freezed
+/// class Model with _$Model {
+///   factory Model({
+///     @JsonKey(includeIfNull: true) @nullTimestampConv DateTime? disabledAt,
+///   }) = _Model;
+///
+///   factory Model.fromJson(Map<String, dynamic> json) => _$ModelFromJson(json);
+/// }
+/// ```
+/// Then you'll need something like this:
+/// ```dart
+/// query.('deletedAt', isNull: true);
+/// query.('disabledAt', isNull: true);
+/// ```
+/// [includeIfNull] is perfect fit for this case:
+/// ```dart
+/// @includeIfNull @nullTimestampConv DateTime? disabledAt,
+/// ```
+const includeIfNull = JsonKey(includeIfNull: true);
+
 /// https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
 const int kFirestoreEqualityLimit = 10;
 
@@ -9,5 +31,5 @@ const int kFirestoreEqualityLimit = 10;
 /// [timestampConv]/[nullTimestampConv] detects [kServerTimestampSentinel] and
 /// [FieldValue.serverTimestamp] is put into [json] value instead field value.
 ///
-/// min [DateTime] possible is chosen for least conflict.
+/// min [DateTime] possible is chosen for least possible conflict.
 final kServerTimestampSentinel = DateTime.utc(-271821, 04, 20);

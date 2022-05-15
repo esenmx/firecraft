@@ -159,6 +159,13 @@ extension DocumentSnapshotsEx<T> on List<DocumentSnapshot<T>> {
   Set<T> dataSet() => {for (var doc in this) doc.data()!};
 
   Map<String, T> idDataMap() => {for (var doc in this) doc.id: doc.data()!};
+
+  DocumentSnapshot<T>? firstWhereId(String id) {
+    for (var d in this) {
+      if (d.id == id) return d;
+    }
+    return null;
+  }
 }
 
 extension QuerySnapshotEx<T> on QuerySnapshot<T> {
@@ -167,4 +174,6 @@ extension QuerySnapshotEx<T> on QuerySnapshot<T> {
   Set<T> dataSet() => docs.dataSet();
 
   Map<String, T> idDataMap() => docs.idDataMap();
+
+  DocumentSnapshot<T>? firstWhereId(String id) => docs.firstWhereId(id);
 }
