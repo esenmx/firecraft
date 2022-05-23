@@ -11,6 +11,6 @@ part 'src/constants.dart';
 part 'src/converters.dart';
 part 'src/extensions.dart';
 part 'src/input_formatter.dart';
-part 'src/query_get.dart';
+part 'src/query_get_srollable_builder.dart';
 part 'src/query_listen.dart';
 part 'src/unmodifiable.dart';

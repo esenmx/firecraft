@@ -1,7 +1,9 @@
 part of firestorex;
 
 typedef QuerySnapshotWidgetBuilder<T> = Scrollable Function(
-    BuildContext context, QuerySnapshot<T> snapshot);
+  BuildContext context,
+  QuerySnapshot<T> snapshot,
+);
 
 class QueryListenBuilder extends StatefulWidget {
   const QueryListenBuilder({Key? key}) : super(key: key);
