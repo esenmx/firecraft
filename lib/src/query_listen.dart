@@ -15,6 +15,6 @@ class QueryListenBuilder extends StatefulWidget {
 class _QueryListenBuilderState extends State<QueryListenBuilder> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    throw UnimplementedError();
   }
 }

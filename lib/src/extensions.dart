@@ -95,7 +95,6 @@ extension TextSearchX on String {
   }
 }
 
-///
 /// Collection for querying based on [updatedAt] field, also essential if you
 /// are caching with local database([Sqlite], [SharedPreferences], [Hive] etc...).
 /// Store queried documents with [dateTime] field so when you query again.
@@ -160,9 +159,11 @@ extension DocumentSnapshotsX<T> on List<DocumentSnapshot<T>> {
 
   Map<String, T> idDataMap() => {for (var doc in this) doc.id: doc.data()!};
 
-  DocumentSnapshot<T>? firstWhereId(String id) {
+  DocumentSnapshot<T>? firstWhereWithId(String id) {
     for (var d in this) {
-      if (d.id == id) return d;
+      if (d.id == id) {
+        return d;
+      }
     }
     return null;
   }
@@ -175,9 +176,11 @@ extension QuerySnapshotX<T> on QuerySnapshot<T> {
 
   Map<String, T> idDataMap() => docs.idDataMap();
 
-  DocumentSnapshot<T>? firstWhereId(String id) => docs.firstWhereId(id);
+  DocumentSnapshot<T>? firstWhereId(String id) => docs.firstWhereWithId(id);
 }
 
 extension IterableX<E> on Iterable<E> {
   List<E>? get notEmptyOrNull => isEmpty ? null : toList();
+
+  E? get singleOrNull => length == 1 ? single : null;
 }

@@ -3,6 +3,12 @@ part of firestorex;
 /// As of [freezed] 2.0, collections are unmodifiable by default.
 /// To work with collections with effectively, you can use this extensions methods.
 /// Methods with [copy] prefix means, it returns copy of itself(just like copyWith).
+///
+/// Using Unmodifiable collections is recommended for non-small projects.
+/// Beware your application may suffer skipped frames with large data sets,
+/// if so use mutable collections or [Isolate]
+/// 
+/// Every unmodifiable collection operation starts with [copy] prefix
 
 extension UnmodifiableMapX<K, V> on Map<K, V> {
   Map<K, V> copyRemove(K id) {

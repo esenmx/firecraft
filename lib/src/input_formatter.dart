@@ -1,6 +1,6 @@
 part of firestorex;
 
-/// todo doc
+/// TODO doc
 class FirestoreSearchFormatter extends TextInputFormatter {
   FirestoreSearchFormatter({
     this.separator = ' ',
