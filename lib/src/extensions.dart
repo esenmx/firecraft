@@ -107,7 +107,7 @@ extension TextSearchX on String {
 /// [cacheHandler] callback will let you manipulate your local database
 ///
 /// todo delete handler
-extension FirestoreX on FirebaseFirestore {
+extension FirebaseFirestoreX on FirebaseFirestore {
   CollectionReference<R> cachedCollection<R>({
     required String path,
     required FirestoreFromJson<R> fromJson,
@@ -134,7 +134,7 @@ extension FirestoreX on FirebaseFirestore {
   }
 }
 
-extension DocumentReferenceEx<R> on DocumentReference<R> {
+extension DocumentReferenceX<R> on DocumentReference<R> {
   Future<void> cachedDelete() async {
     // TODO
     throw UnimplementedError();
@@ -153,7 +153,7 @@ typedef FirestoreCacheDeleter<R> = void Function(
 typedef FirestoreFromJson<R> = R Function(Map<String, dynamic> json);
 typedef FirestoreToJson<R> = Map<String, Object?> Function(R value);
 
-extension DocumentSnapshotsEx<T> on List<DocumentSnapshot<T>> {
+extension DocumentSnapshotsX<T> on List<DocumentSnapshot<T>> {
   Set<String> idSet() => {for (var doc in this) doc.id};
 
   Set<T> dataSet() => {for (var doc in this) doc.data()!};
@@ -168,7 +168,7 @@ extension DocumentSnapshotsEx<T> on List<DocumentSnapshot<T>> {
   }
 }
 
-extension QuerySnapshotEx<T> on QuerySnapshot<T> {
+extension QuerySnapshotX<T> on QuerySnapshot<T> {
   Set<String> idSet() => docs.idSet();
 
   Set<T> dataSet() => docs.dataSet();
@@ -176,4 +176,8 @@ extension QuerySnapshotEx<T> on QuerySnapshot<T> {
   Map<String, T> idDataMap() => docs.idDataMap();
 
   DocumentSnapshot<T>? firstWhereId(String id) => docs.firstWhereId(id);
+}
+
+extension IterableX<E> on Iterable<E> {
+  List<E>? get notEmptyOrNull => isEmpty ? null : toList();
 }
