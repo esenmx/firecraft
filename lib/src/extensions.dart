@@ -103,7 +103,7 @@ extension TextSearchX on String {
 /// collection.where('timestamp', isGreaterThan: collectionObject.timestamp);
 /// ```
 /// Only newer documents will be queried by doing so.
-/// [cacheHandler] callback will let you manipulate your local database
+/// [handler] callback will let you manipulate your local database
 ///
 /// todo delete handler
 extension FirebaseFirestoreX on FirebaseFirestore {
