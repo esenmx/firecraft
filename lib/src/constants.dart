@@ -20,6 +20,9 @@ part of firestorex;
 /// ```dart
 /// @includeIfNull @nullTimestampConv DateTime? disabledAt,
 /// ```
+///
+/// Beware!!!, only put null values into json if you need to query them,
+/// otherwise it will increase both database and traffic size for no reason.
 const includeIfNull = JsonKey(includeIfNull: true);
 
 /// https://firebase.google.com/docs/firestore/query-data/queries#query_limitations

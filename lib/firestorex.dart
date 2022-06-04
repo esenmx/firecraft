@@ -9,7 +9,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'src/constants.dart';
 part 'src/converters.dart';
-part 'src/extensions.dart';
+part 'src/cache.dart';
+part 'src/helpers.dart';
 part 'src/input_formatter.dart';
 part 'src/paginator.dart';
+part 'src/text_search.dart';
 part 'src/unmodifiable.dart';

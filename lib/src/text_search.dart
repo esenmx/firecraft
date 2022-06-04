@@ -1,6 +1,6 @@
 part of firestorex;
 
-extension TextSearchX on String {
+extension TextSearchBuilder on String {
   /// An opinionated way to handle text searches in [Firestore]
   ///
   /// [minLen] stands for number of minimum characters that required for search
@@ -93,94 +93,4 @@ extension TextSearchX on String {
     final indexes = searchIndex(minLen: minLen, separator: separator);
     return {for (var e in indexes) e: true};
   }
-}
-
-/// Collection for querying based on [updatedAt] field, also essential if you
-/// are caching with local database([Sqlite], [SharedPreferences], [Hive] etc...).
-/// Store queried documents with [dateTime] field so when you query again.
-/// A typical query would be:
-/// ```dart
-/// collection.where('timestamp', isGreaterThan: collectionObject.timestamp);
-/// ```
-/// Only newer documents will be queried by doing so.
-/// [handler] callback will let you manipulate your local database
-///
-/// todo delete handler
-extension FirebaseFirestoreX on FirebaseFirestore {
-  CollectionReference<R> cachedCollection<R>({
-    required String path,
-    required FirestoreFromJson<R> fromJson,
-    required FirestoreToJson<R> toJson,
-    required FirestoreCacheHandler<R> cacheHandler,
-    String timestampKey = 'timestamp',
-  }) {
-    return collection(path).withConverter<R>(
-      fromFirestore: (snapshot, _) {
-        final data = snapshot.data()!;
-        final value = fromJson(data);
-        if (data[timestampKey] != null) {
-          final ts = timestampConv.fromJson(data[timestampKey]);
-          cacheHandler(snapshot.id, value, ts);
-        }
-        return value;
-      },
-      toFirestore: (R value, _) {
-        final json = toJson(value);
-        assert(!json.containsKey(timestampKey), '$timestampKey key occupied');
-        return json..[timestampKey] = FieldValue.serverTimestamp();
-      },
-    );
-  }
-}
-
-extension DocumentReferenceX<R> on DocumentReference<R> {
-  Future<void> cachedDelete() async {
-    // TODO
-    throw UnimplementedError();
-  }
-}
-
-typedef FirestoreCacheHandler<R> = void Function(
-  String docId,
-  R value,
-  DateTime timestamp,
-);
-typedef FirestoreCacheDeleter<R> = void Function(
-  String docId,
-  DateTime timestamp,
-);
-typedef FirestoreFromJson<R> = R Function(Map<String, dynamic> json);
-typedef FirestoreToJson<R> = Map<String, Object?> Function(R value);
-
-extension DocumentSnapshotsX<T> on List<DocumentSnapshot<T>> {
-  Set<String> idSet() => {for (var doc in this) doc.id};
-
-  Set<T> dataSet() => {for (var doc in this) doc.data()!};
-
-  Map<String, T> idDataMap() => {for (var doc in this) doc.id: doc.data()!};
-
-  DocumentSnapshot<T>? firstWhereWithId(String id) {
-    for (var d in this) {
-      if (d.id == id) {
-        return d;
-      }
-    }
-    return null;
-  }
-}
-
-extension QuerySnapshotX<T> on QuerySnapshot<T> {
-  Set<String> idSet() => docs.idSet();
-
-  Set<T> dataSet() => docs.dataSet();
-
-  Map<String, T> idDataMap() => docs.idDataMap();
-
-  DocumentSnapshot<T>? firstWhereId(String id) => docs.firstWhereWithId(id);
-}
-
-extension IterableX<E> on Iterable<E> {
-  List<E>? get notEmptyOrNull => isEmpty ? null : toList();
-
-  E? get singleOrNull => length == 1 ? single : null;
 }
