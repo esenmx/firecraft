@@ -54,6 +54,6 @@ typedef FirestoreCacheDeleter<R> = void Function(
   String docId,
   DateTime timestamp,
 );
-typedef FirestoreFromJson<R> = R Function(Map<String, dynamic> json);
+typedef FirestoreFromJson<R> = R Function(Map<String, Object?> json);
 typedef FirestoreToJson<R> = Map<String, Object?> Function(R value);
 

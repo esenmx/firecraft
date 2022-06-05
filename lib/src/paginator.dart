@@ -4,7 +4,7 @@ typedef OnSnapshot<T> = void Function(
     Query<T> query, QuerySnapshot<T> snapshot);
 
 typedef OnError<T> = void Function(
-    Query<T> query, dynamic error, StackTrace stackTrace);
+    Query<T> query, Object? error, StackTrace stackTrace);
 
 const _limitAssertionText = '''
 Your query does not have `limit`, which is a must for a pagination.
@@ -59,6 +59,11 @@ abstract class FirestorePaginator<T> extends StatefulWidget {
   late final limit = query.parameters['limit'] as int;
 }
 
+typedef FirestorePaginatorBuilder<T> = ScrollView Function(
+    BuildContext context, List<DocumentSnapshot<T>> docs, bool isPaginating);
+
+typedef QueryHandler<T> = Future<QuerySnapshot<T>> Function(Query<T> query)?;
+
 /// Cost effective way to pagination. Any update on [DocumentSnapshot] won't
 /// be updated at UI. Choose this method if your [DocumentReference] won't
 /// likely be to change. Otherwise prefer [ReactiveFirestorePaginator]
@@ -104,8 +109,7 @@ class StaticFirestorePaginator<T> extends FirestorePaginator<T> {
   ///         );
   ///       }
   /// ```
-  final ScrollView Function(BuildContext context,
-      List<DocumentSnapshot<T>> docs, bool isPaginating) builder;
+  final FirestorePaginatorBuilder<T> builder;
 
   /// If not null, this method will be used instead default [Query.get()].
   /// Very simple example with [Provider/Riverpod]:
@@ -118,7 +122,7 @@ class StaticFirestorePaginator<T> extends FirestorePaginator<T> {
   ///   return ref.watch(provider(query).future);
   /// }
   /// ```
-  final Future<QuerySnapshot<T>> Function(Query<T> query)? handler;
+  final QueryHandler<T> handler;
 
   @override
   _StaticFirestorePaginatorState<T> createState() =>
@@ -256,8 +260,7 @@ class ReactiveFirestorePaginator<T> extends FirestorePaginator<T> {
   ///         );
   ///       }
   /// ```
-  final ScrollView Function(BuildContext context,
-      List<DocumentSnapshot<T>> docs, bool isPaginating) builder;
+  final FirestorePaginatorBuilder<T> builder;
 
   @override
   _ReactiveFirestorePaginatorState<T> createState() =>

@@ -46,7 +46,7 @@ class Entity {
 
   Entity(this.dateTime);
 
-  factory Entity.fromJson(Map<String, dynamic> json) {
+  factory Entity.fromJson(Map<String, Object?> json) {
     return Entity(timestampConv.fromJson(json['dateTime']));
   }
 

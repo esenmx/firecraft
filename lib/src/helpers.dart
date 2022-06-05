@@ -28,7 +28,5 @@ extension QuerySnapshotX<T> on QuerySnapshot<T> {
 }
 
 extension IterableX<E> on Iterable<E> {
-  List<E>? get notEmptyOrNull => isEmpty ? null : toList();
-
-  E? get singleOrNull => length == 1 ? single : null;
+  List<E>? get nullIfEmpty => isEmpty ? null : toList();
 }

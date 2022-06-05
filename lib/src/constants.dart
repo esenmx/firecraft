@@ -8,7 +8,7 @@ part of firestorex;
 ///     @JsonKey(includeIfNull: true) @nullTimestampConv DateTime? disabledAt,
 ///   }) = _Model;
 ///
-///   factory Model.fromJson(Map<String, dynamic> json) => _$ModelFromJson(json);
+///   factory Model.fromJson(Map<String, Object?> json) => _$ModelFromJson(json);
 /// }
 /// ```
 /// Then you'll need something like this:

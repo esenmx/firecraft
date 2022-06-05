@@ -94,3 +94,22 @@ extension TextSearchBuilder on String {
     return {for (var e in indexes) e: true};
   }
 }
+
+extension SearchQuery<T> on CollectionReference<T> {
+  /// Use with [textSearchMap]. Generates the search query, typically by
+  /// [TextField] input. Be careful of [kFirestoreEqualityLimit].
+  Query<T> textSearchQuery(
+    String text, {
+    String prefix = 'search',
+    String separator = ' ',
+  }) {
+    final trimmedText = text.trim();
+    assert(trimmedText.isNotEmpty);
+    final words = trimmedText.split(separator).toSet();
+    var query = where('$prefix.${words.first}', isEqualTo: true);
+    for (var i = 1; i < words.length; i++) {
+      query = query.where('$prefix.${words.elementAt(i)}', isEqualTo: true);
+    }
+    return query;
+  }
+}
