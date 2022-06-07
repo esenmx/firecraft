@@ -1,10 +1,10 @@
 part of firestorex;
 
 /// TODO doc
-class FirestoreSearchFormatter extends TextInputFormatter {
-  FirestoreSearchFormatter({
+class FirestoreSearchInputFormatter extends TextInputFormatter {
+  FirestoreSearchInputFormatter({
     this.separator = ' ',
-    this.length = kFirestoreEqualityLimit,
+    this.length = kFirestoreEqualityLimit ~/ 2,
   });
 
   final String separator;
@@ -20,7 +20,7 @@ class FirestoreSearchFormatter extends TextInputFormatter {
       return oldValue;
     }
     if (newText.endsWith(separator)) {
-      if (newText._prepareForIndex(separator).length == length) {
+      if (newText._warmup(separator).length == length) {
         return oldValue;
       }
     }

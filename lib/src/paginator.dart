@@ -181,11 +181,9 @@ class _StaticFirestorePaginatorState<T>
   @override
   void didUpdateWidget(covariant StaticFirestorePaginator<T> oldWidget) {
     if (widget.query != oldWidget.query) {
-      setState(() {
-        docs.clear();
-        lastSnapshot = null;
-        paginate();
-      });
+      docs.clear();
+      lastSnapshot = null;
+      paginate();
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -330,11 +328,8 @@ class _ReactiveFirestorePaginatorState<T>
   void didUpdateWidget(covariant ReactiveFirestorePaginator<T> oldWidget) {
     if (widget.query != oldWidget.query) {
       subscription?.cancel();
-      setState(() {
-        subscription = null;
-        effectiveLimit = widget.limit;
-        docs.clear();
-      });
+      effectiveLimit = widget.limit;
+      docs.clear();
       paginate();
     }
     super.didUpdateWidget(oldWidget);

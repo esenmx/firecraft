@@ -6,8 +6,8 @@ extension StringExtensions on String {
 }
 
 void main() async {
-  testWidgets('FirestoreSearchFormatter', (WidgetTester tester) async {
-    final formatter = FirestoreSearchFormatter();
+  testWidgets('FirestoreSearchInputFormatter', (WidgetTester tester) async {
+    final formatter = FirestoreSearchInputFormatter();
 
     /// Updates
     var oldValue = 'text'.value, newValue = 'text '.value;

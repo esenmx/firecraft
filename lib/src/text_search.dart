@@ -3,8 +3,8 @@ part of firestorex;
 extension TextSearchBuilder on String {
   /// An opinionated way to handle text searches in [Firestore]
   ///
-  /// [minLen] stands for number of minimum characters that required for search
-  /// [separator] is word separator, typically a white space
+  /// [slize] (aka. [slice] + [size]) stands for size of [String]s that required
+  /// for search [separator] is word separator (typically a white space)
   ///
   /// Instead bloating your model with and extra field, mutate your [toJson]
   /// method within converter via [textSearchArray] or [textSearchMap]
@@ -18,13 +18,16 @@ extension TextSearchBuilder on String {
   ///     );
   /// ```
   @visibleForTesting
-  Iterable<String> searchIndex({int minLen = 4, String separator = ' '}) sync* {
-    assert(minLen > 1, 'minimum length must be greater than 1');
-
-    for (var s in _prepareForIndex(separator)) {
-      if (s.length > minLen) {
-        var buffer = StringBuffer(s.substring(0, minLen - 1));
-        for (int i = minLen - 1; i < s.length; i++) {
+  Iterable<String> searchIndexer({
+    int slize = 4,
+    String separator = ' ',
+  }) sync* {
+    assert(slize > 1, 'slice size must be greater than 1');
+    final strings = _warmup(separator);
+    for (var s in strings) {
+      if (s.length > slize) {
+        var buffer = StringBuffer(s.substring(0, slize - 1));
+        for (int i = slize - 1; i < s.length; i++) {
           buffer.writeCharCode(s.codeUnitAt(i));
           yield buffer.toString();
         }
@@ -37,7 +40,7 @@ extension TextSearchBuilder on String {
 
   /// Eliminates empty split strings and lowercase all of them
   /// [toLowerCase()] eliminates conflicts like Turkish i-İ, English i-I
-  Iterable<String> _prepareForIndex(String separator) {
+  Iterable<String> _warmup(String separator) {
     return split(separator)
         .where((e) => e.isNotEmpty)
         .map((e) => e.toLowerCase());
@@ -63,8 +66,8 @@ extension TextSearchBuilder on String {
   /// ```dart
   /// firestore.collection('objects').where('search', arrayContainsAny: [keywords]);
   /// ```
-  List<String> textSearchArray({int minLen = 3, String separator = ' '}) {
-    return List<String>.from(searchIndex(minLen: minLen, separator: separator));
+  List<String> textSearchArray({int slize = 3, String separator = ' '}) {
+    return List<String>.from(searchIndexer(slize: slize, separator: separator));
   }
 
   /// For [containsAll] elements
@@ -89,13 +92,13 @@ extension TextSearchBuilder on String {
   /// [Caution]!!! Always create nested objects for searching, otherwise you
   /// should manage your indexes. See:
   /// https://firebase.google.com/docs/firestore/solutions/index-map-field
-  Map<String, bool> textSearchMap({int minLen = 3, String separator = ' '}) {
-    final indexes = searchIndex(minLen: minLen, separator: separator);
+  Map<String, bool> textSearchMap({int slize = 3, String separator = ' '}) {
+    final indexes = searchIndexer(slize: slize, separator: separator);
     return {for (var e in indexes) e: true};
   }
 }
 
-extension SearchQuery<T> on CollectionReference<T> {
+extension SearchQuery<T> on Query<T> {
   /// Use with [textSearchMap]. Generates the search query, typically by
   /// [TextField] input. Be careful of [kFirestoreEqualityLimit].
   Query<T> textSearchQuery(
@@ -106,8 +109,8 @@ extension SearchQuery<T> on CollectionReference<T> {
     final trimmedText = text.trim();
     assert(trimmedText.isNotEmpty);
     final words = trimmedText.split(separator).toSet();
-    var query = where('$prefix.${words.first}', isEqualTo: true);
-    for (var i = 1; i < words.length; i++) {
+    var query = this;
+    for (var i = 0; i < words.length; i++) {
       query = query.where('$prefix.${words.elementAt(i)}', isEqualTo: true);
     }
     return query;
