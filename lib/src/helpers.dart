@@ -1,6 +1,6 @@
 part of firestorex;
 
-extension DocumentSnapshotsX<T> on List<DocumentSnapshot<T>> {
+extension DocumentSnapshotsHelper<T> on List<DocumentSnapshot<T>> {
   Set<String> idSet() => {for (var doc in this) doc.id};
 
   Set<T> dataSet() => {for (var doc in this) doc.data()!};
@@ -17,7 +17,7 @@ extension DocumentSnapshotsX<T> on List<DocumentSnapshot<T>> {
   }
 }
 
-extension QuerySnapshotX<T> on QuerySnapshot<T> {
+extension QuerySnapshotHelper<T> on QuerySnapshot<T> {
   Set<String> idSet() => docs.idSet();
 
   Set<T> dataSet() => docs.dataSet();
@@ -27,6 +27,10 @@ extension QuerySnapshotX<T> on QuerySnapshot<T> {
   DocumentSnapshot<T>? firstWhereId(String id) => docs.firstWhereWithId(id);
 }
 
-extension IterableX<E> on Iterable<E> {
+extension IterableHelper<E> on Iterable<E> {
   List<E>? get nullIfEmpty => isEmpty ? null : toList();
+}
+
+extension StringHelper on String {
+  String? get nullIfEmpty => isEmpty ? null : this;
 }

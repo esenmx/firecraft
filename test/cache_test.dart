@@ -4,27 +4,7 @@ import 'package:firestorex/firestorex.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 
-void main() async {
-  test('createIndexes', () {
-    expect([], ''.searchIndexer());
-    expect([], '       '.searchIndexer());
-    expect([' '], ' ---------'.searchIndexer(separator: '-'));
-    expect(['test'], 'test'.searchIndexer(slize: 5));
-    expect(['tes', 'test'], 'test'.searchIndexer(slize: 3).toList());
-    expect(
-      ['exam', 'examp', 'exampl', 'example', 'valu', 'value'],
-      ' example Value '.searchIndexer().toList(),
-    );
-    expect(
-      ['a', 'quick', 'brown'],
-      ' a  quick   brown'.searchIndexer(slize: 5).toList(),
-    );
-    expect(
-      ['foo', 'bar', 'baz'],
-      'foo,,,,bar,baz'.searchIndexer(slize: 6, separator: ',').toList(),
-    );
-  });
-
+void main(List<String> args) {
   testWidgets('cachedCollection', (t) async {
     final collection = FakeFirebaseFirestore().cachedCollection<Entity>(
       path: 'test',

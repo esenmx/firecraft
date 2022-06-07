@@ -18,8 +18,8 @@ extension TextSearchBuilder on String {
   ///     );
   /// ```
   @visibleForTesting
-  Iterable<String> searchIndexer({
-    int slize = 4,
+  Iterable<String> searchableStrings({
+    int slize = 3,
     String separator = ' ',
   }) sync* {
     assert(slize > 1, 'slice size must be greater than 1');
@@ -67,7 +67,7 @@ extension TextSearchBuilder on String {
   /// firestore.collection('objects').where('search', arrayContainsAny: [keywords]);
   /// ```
   List<String> textSearchArray({int slize = 3, String separator = ' '}) {
-    return List<String>.from(searchIndexer(slize: slize, separator: separator));
+    return searchableStrings(slize: slize, separator: separator).toList();
   }
 
   /// For [containsAll] elements
@@ -93,8 +93,8 @@ extension TextSearchBuilder on String {
   /// should manage your indexes. See:
   /// https://firebase.google.com/docs/firestore/solutions/index-map-field
   Map<String, bool> textSearchMap({int slize = 3, String separator = ' '}) {
-    final indexes = searchIndexer(slize: slize, separator: separator);
-    return {for (var e in indexes) e: true};
+    final strings = searchableStrings(slize: slize, separator: separator);
+    return {for (var e in strings) e: true};
   }
 }
 
