@@ -56,4 +56,3 @@ typedef FirestoreCacheDeleter<R> = void Function(
 );
 typedef FirestoreFromJson<R> = R Function(Map<String, Object?> json);
 typedef FirestoreToJson<R> = Map<String, Object?> Function(R value);
-

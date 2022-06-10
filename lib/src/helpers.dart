@@ -31,6 +31,10 @@ extension IterableHelper<E> on Iterable<E> {
   List<E>? get nullIfEmpty => isEmpty ? null : toList();
 }
 
+extension MapHelper<K, V> on Map<K, V> {
+  Map<K, V>? get nullIfEmpty => isEmpty ? null : this;
+}
+
 extension StringHelper on String {
   String? get nullIfEmpty => isEmpty ? null : this;
 }
