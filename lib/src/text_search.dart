@@ -103,7 +103,7 @@ extension SearchQuery<T> on Query<T> {
   /// [TextField] input. Be careful of [kFirestoreEqualityLimit].
   Query<T> textSearchQuery(
     String text, {
-    String prefix = 'search',
+    String prefix = 'search.',
     String separator = ' ',
   }) {
     final trimmedText = text.trim();
@@ -111,7 +111,7 @@ extension SearchQuery<T> on Query<T> {
     final words = trimmedText.split(separator).toSet();
     var query = this;
     for (var i = 0; i < words.length; i++) {
-      query = query.where('$prefix.${words.elementAt(i)}', isEqualTo: true);
+      query = query.where('$prefix${words.elementAt(i)}', isEqualTo: true);
     }
     return query;
   }
