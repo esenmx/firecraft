@@ -24,8 +24,8 @@ void main() async {
     expect(formatter.formatEditUpdate(oldValue, newValue).text, oldValue.text);
 
     /// [FireLimits.kMaxEquality] check
-    final oldText = List.generate(10, (index) => 'text').join(' ') + 'text';
-    final newText = oldText + ' ';
+    final oldText = '${List.generate(10, (index) => 'text').join(' ')}text';
+    final newText = '$oldText ';
     oldValue = oldText.value;
     newValue = newText.value;
     expect(formatter.formatEditUpdate(oldValue, newValue).text, oldValue.text);

@@ -125,7 +125,7 @@ class StaticFirestorePaginator<T> extends FirestorePaginator<T> {
   final QueryHandler<T> handler;
 
   @override
-  _StaticFirestorePaginatorState<T> createState() =>
+  State<StaticFirestorePaginator<T>> createState() =>
       _StaticFirestorePaginatorState<T>();
 }
 
@@ -261,7 +261,7 @@ class ReactiveFirestorePaginator<T> extends FirestorePaginator<T> {
   final FirestorePaginatorBuilder<T> builder;
 
   @override
-  _ReactiveFirestorePaginatorState<T> createState() =>
+  State<ReactiveFirestorePaginator<T>> createState() =>
       _ReactiveFirestorePaginatorState<T>();
 }
 
