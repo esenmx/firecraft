@@ -25,7 +25,17 @@ extension UnmodifiableMapX<K, V> on Map<K, V> {
     V Function(V value) updater, {
     V Function()? ifAbsent,
   }) {
-    return {...this, key: update(key, updater, ifAbsent: ifAbsent)};
+    final value = this[key];
+    final V newValue;
+    if (value != null) {
+      newValue = updater(value);
+    } else {
+      if (ifAbsent == null) {
+        throw StateError('$key not found and ifAbsent is not provided');
+      }
+      newValue = ifAbsent.call();
+    }
+    return {...this, key: newValue};
   }
 
   Map<K, V> copySetBatch(Iterable<MapEntry<K, V>> entries) {
