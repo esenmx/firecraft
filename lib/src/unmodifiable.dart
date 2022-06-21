@@ -7,7 +7,7 @@ part of firestorex;
 /// Using Unmodifiable collections is recommended for non-small projects.
 /// Beware your application may suffer skipped frames with large data sets,
 /// if so use mutable collections or [Isolate]
-/// 
+///
 /// Every unmodifiable collection operation starts with [copy] prefix
 
 extension UnmodifiableMapX<K, V> on Map<K, V> {
@@ -19,6 +19,14 @@ extension UnmodifiableMapX<K, V> on Map<K, V> {
   }
 
   Map<K, V> copySet(K k, V v) => {...this, k: v};
+
+  Map<K, V> copyUpdate(
+    K key,
+    V Function(V value) updater, {
+    V Function()? ifAbsent,
+  }) {
+    return {...this, key: update(key, updater, ifAbsent: ifAbsent)};
+  }
 
   Map<K, V> copySetBatch(Iterable<MapEntry<K, V>> entries) {
     return {...this, for (var e in entries) e.key: e.value};
