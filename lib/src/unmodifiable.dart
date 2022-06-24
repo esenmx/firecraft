@@ -22,16 +22,16 @@ extension UnmodifiableMapX<K, V> on Map<K, V> {
 
   Map<K, V> copyUpdate(
     K key,
-    V Function(V value) updater, {
+    V Function(V value) update, {
     V Function()? ifAbsent,
   }) {
     final value = this[key];
     final V newValue;
     if (value != null) {
-      newValue = updater(value);
+      newValue = update(value);
     } else {
       if (ifAbsent == null) {
-        throw StateError('$key not found and ifAbsent is not provided');
+        throw ArgumentError('$key not found in map (tip: provide ifAbsent)');
       }
       newValue = ifAbsent.call();
     }
@@ -44,6 +44,8 @@ extension UnmodifiableMapX<K, V> on Map<K, V> {
 }
 
 extension UnmodifiableListX<E> on List<E> {
+  List<E> copyAdd(E e) => [...this, e];
+
   List<E> copyRemoveAt(int index) {
     return [
       for (int i = 0; i < length; i++)
@@ -51,5 +53,10 @@ extension UnmodifiableListX<E> on List<E> {
     ];
   }
 
-  List<E> copyAdd(E e) => [...this, e];
+  List<E> copyUpdateAt(int index, E e) {
+    return [
+      for (int i = 0; i < length; i++)
+        if (i == index) e else elementAt(i)
+    ];
+  }
 }
