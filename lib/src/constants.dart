@@ -21,7 +21,7 @@ part of firestorex;
 /// @includeIfNull @nullTimestampConv DateTime? disabledAt,
 /// ```
 ///
-/// Favourably, only put null values into json if you need to query them,
+/// Favorably, only put null values into json if you need to query them,
 /// otherwise it will increase both database and traffic size for no reason.
 const includeIfNull = JsonKey(includeIfNull: true);
 
