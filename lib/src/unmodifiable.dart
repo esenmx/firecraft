@@ -43,13 +43,10 @@ extension MapX<K, V> on Map<K, V> {
   }
 
   Map<K, V> copyWhere(bool Function(K key, V value) test) {
-    final newKeys = <K>{};
-    for (var k in keys) {
-      if (test(k, this[k] as V)) {
-        newKeys.add(k);
-      }
-    }
-    return <K, V>{for (var k in newKeys) k: this[k] as V};
+    return <K, V>{
+      for (var k in keys)
+        if (test(k, this[k] as V)) k: this[k] as V
+    };
   }
 }
 
