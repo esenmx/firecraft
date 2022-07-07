@@ -1,10 +1,15 @@
 part of firestorex;
 
 typedef OnSnapshot<T> = void Function(
-    Query<T> query, QuerySnapshot<T> snapshot);
+  Query<T> query,
+  QuerySnapshot<T> snapshot,
+);
 
 typedef OnError<T> = void Function(
-    Query<T> query, Object? error, StackTrace stackTrace);
+  Query<T> query,
+  Object? error,
+  StackTrace stackTrace,
+);
 
 const _limitAssertionText = '''
 your query does not have `limit`, which is a must for a pagination.
@@ -59,8 +64,11 @@ abstract class FirestorePaginator<T> extends StatefulWidget {
   late final limit = query.parameters['limit'] as int;
 }
 
-typedef FirestorePaginatorBuilder<T> = ScrollView Function(BuildContext context,
-    List<QueryDocumentSnapshot<T>> docs, bool isPaginating);
+typedef FirestorePaginatorBuilder<T> = Widget Function(
+  BuildContext context,
+  List<QueryDocumentSnapshot<T>> docs,
+  bool isPaginating,
+);
 
 typedef QueryHandler<T> = Future<QuerySnapshot<T>> Function(Query<T> query)?;
 
@@ -344,7 +352,6 @@ class _ReactiveFirestorePaginatorState<T>
   @override
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
-      child: widget.builder(context, docs, isPaginating),
       onNotification: (notification) {
         if (!isPaginating && continues) {
           final effectiveMaxScroll =
@@ -355,6 +362,7 @@ class _ReactiveFirestorePaginatorState<T>
         }
         return continues;
       },
+      child: widget.builder(context, docs, isPaginating),
     );
   }
 }
