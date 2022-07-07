@@ -7,11 +7,11 @@ typedef OnError<T> = void Function(
     Query<T> query, Object? error, StackTrace stackTrace);
 
 const _limitAssertionText = '''
-Your query does not have `limit`, which is a must for a pagination.
-Use `Query.limit(int limit)` for providing limit parameter.''';
+your query does not have `limit`, which is a must for a pagination.
+use `Query.limit(int limit)` for providing limit parameter.''';
 
 const _paginationExtentAssertionText = '''
-paginationExtent cannot be negative, this means user have to scroll beyond the body.
+`paginationExtent` cannot be negative, this means user have to scroll beyond the body.
 ''';
 
 /// Very abstract and yet extensible way to build paginated [Firestore] views
@@ -34,14 +34,14 @@ abstract class FirestorePaginator<T> extends StatefulWidget {
   /// If [query] parameter is updated from upper level, [this] will restart
   final Query<T> query;
 
-  /// Called after every succesful pagination request
+  /// Called after every successful pagination request
   /// Useful for caching results. Good news, [Query] implements [==] operator
   /// effectively. Even with case you don't use [cachedCollection] converter
   /// from this package, you can simply create [Map<Query<T>, QuerySnapshot<T>>]
   /// and put the values. Beware, this can result with stale results.
   final OnSnapshot<T>? onSnapshot;
 
-  /// If a pagination proccess throws exception, this will be called instead
+  /// If a pagination process throws exception, this will be called instead
   /// [onSnapshot] callback
   /// [query] parameter is also exposed, so you'll easily know which pagination
   /// request causes the [error]
@@ -59,8 +59,8 @@ abstract class FirestorePaginator<T> extends StatefulWidget {
   late final limit = query.parameters['limit'] as int;
 }
 
-typedef FirestorePaginatorBuilder<T> = ScrollView Function(
-    BuildContext context, List<DocumentSnapshot<T>> docs, bool isPaginating);
+typedef FirestorePaginatorBuilder<T> = ScrollView Function(BuildContext context,
+    List<QueryDocumentSnapshot<T>> docs, bool isPaginating);
 
 typedef QueryHandler<T> = Future<QuerySnapshot<T>> Function(Query<T> query)?;
 
@@ -88,7 +88,7 @@ class StaticFirestorePaginator<T> extends FirestorePaginator<T> {
           paginationExtent: paginationExtent,
         );
 
-  /// All results from paginations provided as [List<QuerySnapshot<T>>].
+  /// All results from pagination provided as [List<QuerySnapshot<T>>].
   /// [isPaginating] stands for showing loading indicator anywhere on your
   /// builder, [setState] is not required for updating state.
   /// ([snapshots.isEmpty && !isPaginating] == true) means no result.
@@ -132,7 +132,7 @@ class StaticFirestorePaginator<T> extends FirestorePaginator<T> {
 class _StaticFirestorePaginatorState<T>
     extends State<StaticFirestorePaginator<T>> {
   QuerySnapshot<T>? lastSnapshot;
-  final docs = <DocumentSnapshot<T>>[];
+  final docs = <QueryDocumentSnapshot<T>>[];
 
   bool isPaginating = true;
 
@@ -213,7 +213,7 @@ class _StaticFirestorePaginatorState<T>
   }
 }
 
-/// Pagination with incrementing limit. Provies up to date data but more costly
+/// Pagination with incrementing limit. Provides up to date data but more costly
 /// than [StaticFirestorePaginator].
 /// Pricing example with [limit] = 10:
 /// For total result size of 35: 10 + 20 + 30 + 35 = 125
@@ -235,7 +235,7 @@ class ReactiveFirestorePaginator<T> extends FirestorePaginator<T> {
           paginationExtent: paginationExtent,
         );
 
-  /// Provides [List<DocumentSnapshot<T>>] based on latest [QuerySnapshot<T>].
+  /// Provides [List<QueryDocumentSnapshot<T>>] based on latest [QuerySnapshot<T>].
   /// Results are always up to date.
   /// [isPaginating] stands for showing loading indicator anywhere on your
   /// builder, [setState] is not required for updating state.
@@ -268,7 +268,7 @@ class ReactiveFirestorePaginator<T> extends FirestorePaginator<T> {
 class _ReactiveFirestorePaginatorState<T>
     extends State<ReactiveFirestorePaginator<T>> {
   StreamSubscription<QuerySnapshot<T>>? subscription;
-  final docs = <DocumentSnapshot<T>>[];
+  final docs = <QueryDocumentSnapshot<T>>[];
 
   late int effectiveLimit = widget.limit;
 
