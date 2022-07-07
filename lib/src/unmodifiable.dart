@@ -67,3 +67,16 @@ extension ListX<E> on List<E> {
     ];
   }
 }
+
+extension SetX<E> on Set<E> {
+  Set<E> copyAdd(E arg) {
+    return <E>{...this, arg};
+  }
+
+  Set<E> copyRemove(E arg) {
+    return {
+      for (var e in this)
+        if (e != arg) e
+    };
+  }
+}
