@@ -3,12 +3,12 @@ part of firestorex;
 extension TextSearchBuilder on String {
   /// An opinionated way to handle text searches in [Firestore]
   ///
-  /// [slize] (aka. [slice] + [size]) stands for size of [String]s that required
+  /// [minKeywordLength] is size of [String]s that required
   /// for search [separator] is word separator (typically a white space)
   ///
   /// Instead bloating your model with and extra field, mutate your [toJson]
   /// method within converter via [textSearchArray] or [textSearchMap]
-  /// Best practise example:
+  /// Best practice example:
   /// ```dart
   /// final memberCollection = firestore.collection('member').withConverter<Member>(
   ///       fromFirestore: (snapshot, options) => Member.fromJson(snapshot.data()!),
@@ -19,15 +19,15 @@ extension TextSearchBuilder on String {
   /// ```
   @visibleForTesting
   Iterable<String> searchableStrings({
-    int slize = 3,
+    int minKeywordLength = 3,
     String separator = ' ',
   }) sync* {
-    assert(slize > 1, 'slice size must be greater than 1');
+    assert(minKeywordLength > 1, 'slice size must be greater than 1');
     final strings = _warmup(separator);
     for (var s in strings) {
-      if (s.length > slize) {
-        var buffer = StringBuffer(s.substring(0, slize - 1));
-        for (int i = slize - 1; i < s.length; i++) {
+      if (s.length > minKeywordLength) {
+        var buffer = StringBuffer(s.substring(0, minKeywordLength - 1));
+        for (int i = minKeywordLength - 1; i < s.length; i++) {
           buffer.writeCharCode(s.codeUnitAt(i));
           yield buffer.toString();
         }
@@ -66,8 +66,14 @@ extension TextSearchBuilder on String {
   /// ```dart
   /// firestore.collection('objects').where('search', arrayContainsAny: [keywords]);
   /// ```
-  List<String> textSearchArray({int slize = 3, String separator = ' '}) {
-    return searchableStrings(slize: slize, separator: separator).toList();
+  List<String> textSearchArray({
+    int minKeywordLength = 3,
+    String separator = ' ',
+  }) {
+    return searchableStrings(
+      minKeywordLength: minKeywordLength,
+      separator: separator,
+    ).toList();
   }
 
   /// For [containsAll] elements
@@ -92,8 +98,14 @@ extension TextSearchBuilder on String {
   /// [Caution]!!! Always create nested objects for searching, otherwise you
   /// should manage your indexes. See:
   /// https://firebase.google.com/docs/firestore/solutions/index-map-field
-  Map<String, bool> textSearchMap({int slize = 3, String separator = ' '}) {
-    final strings = searchableStrings(slize: slize, separator: separator);
+  Map<String, bool> textSearchMap({
+    int minKeywordLength = 3,
+    String separator = ' ',
+  }) {
+    final strings = searchableStrings(
+      minKeywordLength: minKeywordLength,
+      separator: separator,
+    );
     return {for (var e in strings) e: true};
   }
 }

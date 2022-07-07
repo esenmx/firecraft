@@ -16,8 +16,8 @@ extension FirebaseFirestoreX on FirebaseFirestore {
     required String path,
     required FirestoreFromJson<R> fromJson,
     required FirestoreToJson<R> toJson,
-    required FirestoreCacheHandler<R> cacheHandler,
-    String timestampKey = 'timestamp',
+    required FirestoreCacheAddHandler<R> cacheHandler,
+    String timestampKey = 'updatedAt',
   }) {
     return collection(path).withConverter<R>(
       fromFirestore: (snapshot, _) {
@@ -45,12 +45,12 @@ extension DocumentReferenceX<R> on DocumentReference<R> {
   }
 }
 
-typedef FirestoreCacheHandler<R> = void Function(
+typedef FirestoreCacheAddHandler<R> = void Function(
   String docId,
   R value,
   DateTime timestamp,
 );
-typedef FirestoreCacheDeleter<R> = void Function(
+typedef FirestoreCacheEraseHandler<R> = void Function(
   String docId,
   DateTime timestamp,
 );

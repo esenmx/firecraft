@@ -9,8 +9,8 @@ class TimestampConv implements JsonConverter<DateTime, Object?> {
   DateTime fromJson(Object? value) {
     assert(
       value is Timestamp,
-      'A non-null Timestamp value assertion failed.'
-      'If your field is nullable, you must use NullTimestampConv',
+      'a non-null `Timestamp` value assertion failed.'
+      'if your field is nullable, you must use `NullTimestampConv`',
     );
     return (value as Timestamp).toDate();
   }
@@ -33,7 +33,7 @@ class NullTimestampConv implements JsonConverter<DateTime?, Object?> {
   DateTime? fromJson(Object? value) {
     assert(
       value == null || value is Timestamp,
-      'A non Timestamp value returned',
+      'a non `Timestamp` value returned',
     );
     return (value as Timestamp?)?.toDate();
   }
