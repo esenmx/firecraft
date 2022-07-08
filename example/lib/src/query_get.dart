@@ -9,14 +9,14 @@ class QueryGetPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Query Get Example')),
-      body: StaticFirestorePaginator<Model>(
+      body: FirestoreStaticPaginationView<Model>(
         query: collection.limit(10).orderBy('text'),
         onError: (query, error, stackTrace) {
           print('onError.query: ${query.parameters}');
           print('onError.error: $error');
           print('onError.stackTrace: $stackTrace');
         },
-        onNextPage: (query, snapshot) {
+        onSnapshot: (query, snapshot) {
           final ids = snapshot.docs.map((e) => e.id);
           print('onPaginationEnd{${ids.join(', ')}}');
         },
@@ -29,7 +29,7 @@ class QueryGetPage extends StatelessWidget {
               context: context,
               tiles: [
                 for (var d in docs)
-                  ListTile(title: Text(d.data()!.text), subtitle: Text(d.id)),
+                  ListTile(title: Text(d.data().text), subtitle: Text(d.id)),
                 if (isPaginating) const CircularProgressIndicator(),
                 if (docs.isEmpty && !isPaginating) const FlutterLogo()
               ],

@@ -1,39 +1,23 @@
 part of firestorex;
 
-typedef OnSnapshot<T> = void Function(
-  Query<T> query,
-  QuerySnapshot<T> snapshot,
-);
-
-typedef OnError<T> = void Function(
-  Query<T> query,
-  Object? error,
-  StackTrace stackTrace,
-);
-
-const _limitAssertionText = '''
-your query does not have `limit`, which is a must for a pagination.
-use `Query.limit(int limit)` for providing limit parameter.''';
-
-const _paginationExtentAssertionText = '''
-`paginationExtent` cannot be negative, this means user have to scroll beyond the body.
-''';
-
 /// Very abstract and yet extensible way to build paginated [Firestore] views
 /// Requires [ScrollView] as a child and any of [ListView], [GridView],
 /// [CustomScrollView] etc... is usable.
 /// [T] is the type of your [CollectionReference<T>] or [QuerySnapshot<T>]
-abstract class FirestorePaginator<T> extends StatefulWidget {
-  FirestorePaginator({
-    Key? key,
+abstract class FirestorePaginationView<T> extends StatefulWidget {
+  FirestorePaginationView({
+    super.key,
     required this.query,
     this.onSnapshot,
     this.onError,
     this.onComplete,
     this.paginationExtent = kMinInteractiveDimension,
-  })  : assert(paginationExtent >= 0, _paginationExtentAssertionText),
-        assert(query.parameters.containsKey('limit'), _limitAssertionText),
-        super(key: key);
+  })  : assert(paginationExtent >= 0, '''
+`paginationExtent` cannot be negative, this means user have to scroll beyond the body.
+'''),
+        assert(query.parameters['limit'] != null, '''
+your query does not have `limit`, which is a must for a pagination.
+use `Query.limit(int limit)` for providing limit parameter.''');
 
   /// [query] requires [Query.limit()] execution.
   /// If [query] parameter is updated from upper level, [this] will restart
@@ -44,13 +28,13 @@ abstract class FirestorePaginator<T> extends StatefulWidget {
   /// effectively. Even with case you don't use [cachedCollection] converter
   /// from this package, you can simply create [Map<Query<T>, QuerySnapshot<T>>]
   /// and put the values. Beware, this can result with stale results.
-  final OnSnapshot<T>? onSnapshot;
+  final Function(Query<T> query, QuerySnapshot<T> snapshot)? onSnapshot;
 
   /// If a pagination process throws exception, this will be called instead
   /// [onSnapshot] callback
   /// [query] parameter is also exposed, so you'll easily know which pagination
   /// request causes the [error]
-  final OnError<T>? onError;
+  final Function(Query<T> query, Object? error, StackTrace stackTrace)? onError;
 
   /// Callback triggered when all results are fetched.
   final VoidCallback? onComplete;
@@ -64,37 +48,28 @@ abstract class FirestorePaginator<T> extends StatefulWidget {
   late final limit = query.parameters['limit'] as int;
 }
 
-typedef FirestorePaginatorBuilder<T> = Widget Function(
+typedef FirestorePaginationViewBuilder<T> = Widget Function(
   BuildContext context,
   List<QueryDocumentSnapshot<T>> docs,
   bool isPaginating,
 );
 
-typedef QueryHandler<T> = Future<QuerySnapshot<T>> Function(Query<T> query)?;
-
 /// Cost effective way to pagination. Any update on [DocumentSnapshot] won't
 /// be updated at UI. Choose this method if your [DocumentReference] won't
-/// likely be to change. Otherwise prefer [ReactiveFirestorePaginator]
+/// likely be to change. Otherwise prefer [FirestoreLivePaginationView]
 /// Cost, only in case of last [QuerySnapshot].size == [0] +1 read added your
 /// total docs.size. Also it's only 1 read if no result found.
-class StaticFirestorePaginator<T> extends FirestorePaginator<T> {
-  StaticFirestorePaginator({
-    Key? key,
-    required Query<T> query,
+class FirestoreStaticPaginationView<T> extends FirestorePaginationView<T> {
+  FirestoreStaticPaginationView({
+    super.key,
+    required super.query,
     required this.builder,
     this.handler,
-    OnSnapshot<T>? onNextPage,
-    OnError<T>? onError,
-    VoidCallback? onComplete,
-    double paginationExtent = kMinInteractiveDimension,
-  }) : super(
-          key: key,
-          query: query,
-          onSnapshot: onNextPage,
-          onError: onError,
-          onComplete: onComplete,
-          paginationExtent: paginationExtent,
-        );
+    super.onSnapshot,
+    super.onError,
+    super.onComplete,
+    super.paginationExtent = kMinInteractiveDimension,
+  });
 
   /// All results from pagination provided as [List<QuerySnapshot<T>>].
   /// [isPaginating] stands for showing loading indicator anywhere on your
@@ -117,7 +92,7 @@ class StaticFirestorePaginator<T> extends FirestorePaginator<T> {
   ///         );
   ///       }
   /// ```
-  final FirestorePaginatorBuilder<T> builder;
+  final FirestorePaginationViewBuilder<T> builder;
 
   /// If not null, this method will be used instead default [Query.get()].
   /// Very simple example with [Provider/Riverpod]:
@@ -130,15 +105,15 @@ class StaticFirestorePaginator<T> extends FirestorePaginator<T> {
   ///   return ref.watch(provider(query).future);
   /// }
   /// ```
-  final QueryHandler<T> handler;
+  final Future<QuerySnapshot<T>> Function(Query<T> query)? handler;
 
   @override
-  State<StaticFirestorePaginator<T>> createState() =>
-      _StaticFirestorePaginatorState<T>();
+  State<FirestoreStaticPaginationView<T>> createState() =>
+      _FirestoreStaticPaginationViewState<T>();
 }
 
-class _StaticFirestorePaginatorState<T>
-    extends State<StaticFirestorePaginator<T>> {
+class _FirestoreStaticPaginationViewState<T>
+    extends State<FirestoreStaticPaginationView<T>> {
   QuerySnapshot<T>? lastSnapshot;
   final docs = <QueryDocumentSnapshot<T>>[];
 
@@ -187,7 +162,7 @@ class _StaticFirestorePaginatorState<T>
   }
 
   @override
-  void didUpdateWidget(covariant StaticFirestorePaginator<T> oldWidget) {
+  void didUpdateWidget(covariant FirestoreStaticPaginationView<T> oldWidget) {
     if (widget.query != oldWidget.query) {
       docs.clear();
       lastSnapshot = null;
@@ -222,26 +197,20 @@ class _StaticFirestorePaginatorState<T>
 }
 
 /// Pagination with incrementing limit. Provides up to date data but more costly
-/// than [StaticFirestorePaginator].
+/// than [FirestoreStaticPaginationView].
 /// Pricing example with [limit] = 10:
 /// For total result size of 35: 10 + 20 + 30 + 35 = 125
-class ReactiveFirestorePaginator<T> extends FirestorePaginator<T> {
-  ReactiveFirestorePaginator({
-    Key? key,
-    required Query<T> query,
+class FirestoreLivePaginationView<T> extends FirestorePaginationView<T> {
+  FirestoreLivePaginationView({
+    super.key,
+    required super.query,
     required this.builder,
-    OnSnapshot<T>? onSnapshot,
-    OnError<T>? onError,
-    VoidCallback? onComplete,
-    double paginationExtent = kMinInteractiveDimension,
-  }) : super(
-          key: key,
-          query: query,
-          onSnapshot: onSnapshot,
-          onError: onError,
-          onComplete: onComplete,
-          paginationExtent: paginationExtent,
-        );
+    this.handler,
+    super.onSnapshot,
+    super.onError,
+    super.onComplete,
+    super.paginationExtent = kMinInteractiveDimension,
+  });
 
   /// Provides [List<QueryDocumentSnapshot<T>>] based on latest [QuerySnapshot<T>].
   /// Results are always up to date.
@@ -266,15 +235,16 @@ class ReactiveFirestorePaginator<T> extends FirestorePaginator<T> {
   ///         );
   ///       }
   /// ```
-  final FirestorePaginatorBuilder<T> builder;
+  final FirestorePaginationViewBuilder<T> builder;
+  final Stream<QuerySnapshot<T>> Function(Query<T> query)? handler;
 
   @override
-  State<ReactiveFirestorePaginator<T>> createState() =>
-      _ReactiveFirestorePaginatorState<T>();
+  State<FirestoreLivePaginationView<T>> createState() =>
+      _FirestoreLivePaginationViewState<T>();
 }
 
-class _ReactiveFirestorePaginatorState<T>
-    extends State<ReactiveFirestorePaginator<T>> {
+class _FirestoreLivePaginationViewState<T>
+    extends State<FirestoreLivePaginationView<T>> {
   StreamSubscription<QuerySnapshot<T>>? subscription;
   final docs = <QueryDocumentSnapshot<T>>[];
 
@@ -284,7 +254,7 @@ class _ReactiveFirestorePaginatorState<T>
 
   Future<void> paginate() async {
     if (!isPaginating) {
-      /// for [initState()] guard
+      /// guarding [initState()]
       setState(() {
         isPaginating = true;
         effectiveLimit += widget.limit;
@@ -294,16 +264,19 @@ class _ReactiveFirestorePaginatorState<T>
     final query = widget.query.limit(effectiveLimit);
 
     try {
-      final stream = query.snapshots();
+      final Stream<QuerySnapshot<T>> stream;
+      if (widget.handler != null) {
+        stream = widget.handler!(query);
+      } else {
+        stream = query.snapshots();
+      }
 
       subscription?.cancel();
       subscription = stream.listen((event) {
         widget.onSnapshot?.call(query, event);
-
         if (isPaginating && event.size < effectiveLimit) {
           widget.onComplete?.call();
         }
-
         if (mounted) {
           setState(() {
             isPaginating = false;
@@ -333,7 +306,7 @@ class _ReactiveFirestorePaginatorState<T>
   }
 
   @override
-  void didUpdateWidget(covariant ReactiveFirestorePaginator<T> oldWidget) {
+  void didUpdateWidget(covariant FirestoreLivePaginationView<T> oldWidget) {
     if (widget.query != oldWidget.query) {
       subscription?.cancel();
       effectiveLimit = widget.limit;
