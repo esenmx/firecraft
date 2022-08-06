@@ -1,14 +1,24 @@
 import 'package:firestorex/firestorex.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+class _Conv implements JsonConverter<int, int> {
+  const _Conv();
+
+  @override
+  int fromJson(int json) => json;
+
+  @override
+  int toJson(int object) => object;
+}
 
 void main() {
   group('ArrayConv', () {
-    const conv = ArrayConv();
-
+    const conv = ArrayConv<int, int>(_Conv());
     test('fromJson', () {
       expect(conv.fromJson({'0': 9, '1': 8}), [9, 8]);
       expect(conv.fromJson({}), []);
-      expect(() => conv.fromJson({'1': 0}), throwsA(isA<AssertionError>()));
+      expect(conv.fromJson({'1': 0}), [0]);
     });
 
     test('toJson', () {
@@ -18,8 +28,7 @@ void main() {
   });
 
   group('NestedArrayConv', () {
-    const conv = NestedArrayConv();
-
+    const conv = ArrayConv<List<int>, Map>(ArrayConv<int, int>(_Conv()));
     test('fromJson', () {
       expect(
           conv.fromJson({
@@ -31,7 +40,7 @@ void main() {
             []
           ]);
       expect(conv.fromJson({}), []);
-      expect(() => conv.fromJson({'1': {}}), throwsA(isA<AssertionError>()));
+      expect(conv.fromJson({'1': {}}), [[]]);
     });
 
     test('toJson', () {

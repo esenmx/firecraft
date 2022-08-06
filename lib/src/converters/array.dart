@@ -1,51 +1,25 @@
 part of firestorex;
 
-class ArrayConv<T> implements JsonConverter<List<T>, Map<String, dynamic>> {
-  const ArrayConv();
+/// [O] is object type, [J] json type
+class ArrayConv<O, J> implements JsonConverter<List<O>, Map<String, dynamic>> {
+  const ArrayConv([this.conv]);
+
+  final JsonConverter<O, J>? conv;
 
   @override
-  List<T> fromJson(Map<String, dynamic> json) {
-    final array = <T>[];
-    for (var i = 0; i < json.length; i++) {
-      assert(json.containsKey(i.toString()));
-      array.add(json[i.toString()] as T);
-    }
-    return array;
+  List<O> fromJson(Map json) {
+    final keys = json.keys.toList()..sort();
+    return [
+      for (var k in keys)
+        if (conv == null) json[k] as O else conv!.fromJson(json[k] as J)
+    ];
   }
 
   @override
-  Map<String, T> toJson(List<T> object) {
-    return {for (var i = 0; i < object.length; i++) i.toString(): object[i]};
-  }
-}
-
-class NestedArrayConv<T>
-    implements JsonConverter<List<List<T>>, Map<String, dynamic>> {
-  const NestedArrayConv();
-
-  @override
-  List<List<T>> fromJson(Map<String, dynamic> json) {
-    final array = <List<T>>[];
-    for (var i = 0; i < json.length; i++) {
-      assert(json.containsKey(i.toString()));
-      final subArray = <T>[];
-      array.add(subArray);
-      final subJson = json[i.toString()] as Map;
-      for (var j = 0; j < subJson.length; j++) {
-        assert(subJson.containsKey(j.toString()));
-        subArray.add(subJson[j.toString()] as T);
-      }
-    }
-    return array;
-  }
-
-  @override
-  Map<String, Map<String, T>> toJson(List<List<T>> object) {
+  Map<String, J> toJson(List<O> object) {
     return {
       for (var i = 0; i < object.length; i++)
-        i.toString(): {
-          for (var j = 0; j < object[i].length; j++) j.toString(): object[i][j]
-        }
+        i.toString(): conv == null ? object[i] as J : conv!.toJson(object[i])
     };
   }
 }
