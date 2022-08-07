@@ -24,7 +24,7 @@ extension FirebaseFirestoreX on FirebaseFirestore {
         final data = snapshot.data()!;
         final value = fromJson(data);
         if (data[timestampKey] != null) {
-          final ts = timestampConv.fromJson(data[timestampKey]);
+          final ts = const TimestampConv().fromJson(data[timestampKey]);
           cacheHandler(snapshot.id, value, ts);
         }
         return value;

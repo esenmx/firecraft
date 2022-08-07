@@ -7,8 +7,8 @@ void main() async {
   final fake = FakeFirebaseFirestore();
   final collection = fake.collection('test');
   group('TimestampConv', () {
-    final toJson = timestampConv.toJson;
-    final fromJson = timestampConv.fromJson;
+    final toJson = const TimestampConv().toJson;
+    final fromJson = const TimestampConv().fromJson;
 
     test('fromJson(null) error', () {
       expect(() => fromJson(null), throwsA(isA<AssertionError>()));
@@ -42,8 +42,8 @@ void main() async {
   });
 
   group('NullTimestampConv', () {
-    final toJson = nullTimestampConv.toJson;
-    final fromJson = nullTimestampConv.fromJson;
+    final toJson = const NullTimestampConv().toJson;
+    final fromJson = const NullTimestampConv().fromJson;
 
     test('null value', () async {
       final doc = collection.doc();

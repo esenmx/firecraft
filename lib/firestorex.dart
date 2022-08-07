@@ -12,6 +12,7 @@ part 'src/cache.dart';
 part 'src/constants.dart';
 part 'src/converters/array.dart';
 part 'src/converters/blob.dart';
+part 'src/converters/int_str.dart';
 part 'src/converters/timestamp.dart';
 part 'src/helpers.dart';
 part 'src/input_formatter.dart';

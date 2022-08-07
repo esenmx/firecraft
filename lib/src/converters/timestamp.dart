@@ -1,7 +1,5 @@
 part of firestorex;
 
-const timestampConv = TimestampConv();
-
 class TimestampConv implements JsonConverter<DateTime, Object?> {
   const TimestampConv();
 
@@ -23,8 +21,6 @@ class TimestampConv implements JsonConverter<DateTime, Object?> {
     return Timestamp.fromDate(value);
   }
 }
-
-const nullTimestampConv = NullTimestampConv();
 
 class NullTimestampConv implements JsonConverter<DateTime?, Object?> {
   const NullTimestampConv();
