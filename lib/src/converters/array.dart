@@ -1,6 +1,6 @@
 part of firestorex;
 
-/// [O] is object type, [J] json type
+/// [O] is element type, [J] json type of element
 class ArrayConv<O, J> implements JsonConverter<List<O>, Map<String, dynamic>> {
   const ArrayConv([this.conv]);
 
