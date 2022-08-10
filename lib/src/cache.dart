@@ -16,7 +16,7 @@ extension FirebaseFirestoreX on FirebaseFirestore {
     required String path,
     required FromJson<R> fromJson,
     required ToJson<R> toJson,
-    required FirestoreCacheAddHandler<R> cacheHandler,
+    required FirestoreCacheOnData<R> onData,
     String timestampKey = 'updatedAt',
   }) {
     return collection(path).withConverter<R>(
@@ -25,7 +25,7 @@ extension FirebaseFirestoreX on FirebaseFirestore {
         final value = fromJson(data);
         if (data[timestampKey] != null) {
           final ts = const TimestampConv().fromJson(data[timestampKey]);
-          cacheHandler(snapshot.id, value, ts);
+          onData(snapshot.id, value, ts);
         }
         return value;
       },
@@ -45,12 +45,12 @@ extension DocumentReferenceX<R> on DocumentReference<R> {
   }
 }
 
-typedef FirestoreCacheAddHandler<R> = void Function(
+typedef FirestoreCacheOnData<R> = void Function(
   String id,
   R data,
   DateTime timestamp,
 );
-typedef FirestoreCacheEraseHandler<R> = void Function(
+typedef FirestoreCacheOnDelete<R> = void Function(
   String id,
   DateTime timestamp,
 );

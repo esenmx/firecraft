@@ -18,12 +18,12 @@ extension TextSearchBuilder on String {
   ///     );
   /// ```
   @visibleForTesting
-  Iterable<String> searchableStrings({
+  Iterable<String> strings({
     int minKeywordLength = 3,
     String separator = ' ',
   }) sync* {
     assert(minKeywordLength > 1, 'slice size must be greater than 1');
-    final strings = _warmup(separator);
+    final strings = _expand(separator);
     for (var s in strings) {
       if (s.length > minKeywordLength) {
         var buffer = StringBuffer(s.substring(0, minKeywordLength - 1));
@@ -38,9 +38,9 @@ extension TextSearchBuilder on String {
     }
   }
 
-  /// Eliminates empty split strings and lowercase all of them
-  /// [toLowerCase()] eliminates conflicts like Turkish i-İ, English i-I
-  Iterable<String> _warmup(String separator) {
+  /// Eliminates empty split strings and lowercase all of them.
+  /// [toLowerCase()] eliminates conflicts like Turkish İ-i, English I-i.
+  Iterable<String> _expand(String separator) {
     return split(separator)
         .where((e) => e.isNotEmpty)
         .map((e) => e.toLowerCase());
@@ -70,7 +70,7 @@ extension TextSearchBuilder on String {
     int minKeywordLength = 3,
     String separator = ' ',
   }) {
-    return searchableStrings(
+    return strings(
       minKeywordLength: minKeywordLength,
       separator: separator,
     ).toList();
@@ -102,11 +102,11 @@ extension TextSearchBuilder on String {
     int minKeywordLength = 3,
     String separator = ' ',
   }) {
-    final strings = searchableStrings(
+    final index = strings(
       minKeywordLength: minKeywordLength,
       separator: separator,
     );
-    return {for (var e in strings) e: true};
+    return {for (var e in index) e: true};
   }
 }
 

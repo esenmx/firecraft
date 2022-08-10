@@ -10,7 +10,7 @@ void main(List<String> args) {
       path: 'test',
       fromJson: (json) => Entity.fromJson(json),
       toJson: (val) => val.toJson(),
-      cacheHandler: (id, val, ts) {
+      onData: (id, val, ts) {
         const d = Duration(milliseconds: 1); // may vary depend on machine
         expect(val.dateTime.withinDuration(ts, d), isTrue);
       },
