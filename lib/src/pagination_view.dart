@@ -20,14 +20,15 @@ your query does not have `limit`, which is a must for a pagination.
 use `Query.limit(int limit)` for providing limit parameter.''');
 
   /// [query] requires [Query.limit()] execution.
-  /// If [query] parameter is updated from upper level, [this] will restart
+  /// If [query] parameter is updated from upper level, [this] will restart.
   final Query<T> query;
 
   /// Called after every successful pagination request
   /// Useful for caching results. Good news, [Query] implements [==] operator
   /// effectively. Even with case you don't use [cachedCollection] converter
   /// from this package, you can simply create [Map<Query<T>, QuerySnapshot<T>>]
-  /// and put the values. Beware, this can result with stale results.
+  /// and put the values.
+  /// Beware, this can result with stale results.
   final Function(Query<T> query, QuerySnapshot<T> snapshot)? onSnapshot;
 
   /// If a pagination process throws exception, this will be called instead
@@ -36,7 +37,7 @@ use `Query.limit(int limit)` for providing limit parameter.''');
   /// request causes the [error]
   final Function(Query<T> query, Object? error, StackTrace stackTrace)? onError;
 
-  /// Callback triggered when all results are fetched.
+  /// Callback triggered when pagination is completed.
   final VoidCallback? onComplete;
 
   /// Makes possible the eager pagination. Default is set to
@@ -206,6 +207,7 @@ class FirestoreLivePaginationView<T> extends FirestorePaginationView<T> {
     required super.query,
     required this.builder,
     this.handler,
+    this.initialSnapshotHandler,
     super.onSnapshot,
     super.onError,
     super.onComplete,
@@ -238,6 +240,10 @@ class FirestoreLivePaginationView<T> extends FirestorePaginationView<T> {
   final FirestorePaginationViewBuilder<T> builder;
   final Stream<QuerySnapshot<T>> Function(Query<T> query)? handler;
 
+  /// Handler for initial [Stream] values provided by [StreamProvider],
+  /// [BehaviourSubject] etc.
+  final QuerySnapshot<T>? Function(Query<T> query)? initialSnapshotHandler;
+
   @override
   State<FirestoreLivePaginationView<T>> createState() =>
       _FirestoreLivePaginationViewState<T>();
@@ -246,9 +252,9 @@ class FirestoreLivePaginationView<T> extends FirestorePaginationView<T> {
 class _FirestoreLivePaginationViewState<T>
     extends State<FirestoreLivePaginationView<T>> {
   StreamSubscription<QuerySnapshot<T>>? subscription;
-  final docs = <QueryDocumentSnapshot<T>>[];
+  var docs = <QueryDocumentSnapshot<T>>[];
 
-  late int effectiveLimit = widget.limit;
+  late int totalLimit = widget.limit;
 
   bool isPaginating = true;
 
@@ -257,11 +263,19 @@ class _FirestoreLivePaginationViewState<T>
       /// guarding [initState()]
       setState(() {
         isPaginating = true;
-        effectiveLimit += widget.limit;
+        totalLimit += widget.limit;
       });
     }
 
-    final query = widget.query.limit(effectiveLimit);
+    final query = widget.query.limit(totalLimit);
+
+    if (widget.initialSnapshotHandler != null) {
+      final snapshot = widget.initialSnapshotHandler!(query);
+      if (snapshot?.docs != null) {
+        docs = snapshot!.docs;
+      }
+      isPaginating = snapshot == null;
+    }
 
     try {
       final Stream<QuerySnapshot<T>> stream;
@@ -274,14 +288,13 @@ class _FirestoreLivePaginationViewState<T>
       subscription?.cancel();
       subscription = stream.listen((event) {
         widget.onSnapshot?.call(query, event);
-        if (isPaginating && event.size < effectiveLimit) {
+        if (isPaginating && event.size < totalLimit) {
           widget.onComplete?.call();
         }
         if (mounted) {
           setState(() {
             isPaginating = false;
-            docs.clear();
-            docs.addAll(event.docs);
+            docs = event.docs;
           });
         }
       }, onError: (error, stackTrace) {
@@ -296,7 +309,7 @@ class _FirestoreLivePaginationViewState<T>
     if (subscription == null) {
       return true;
     }
-    return effectiveLimit <= docs.length;
+    return totalLimit <= docs.length;
   }
 
   @override
@@ -309,8 +322,8 @@ class _FirestoreLivePaginationViewState<T>
   void didUpdateWidget(covariant FirestoreLivePaginationView<T> oldWidget) {
     if (widget.query != oldWidget.query) {
       subscription?.cancel();
-      effectiveLimit = widget.limit;
-      docs.clear();
+      totalLimit = widget.limit;
+      docs = [];
       paginate();
     }
     super.didUpdateWidget(oldWidget);
