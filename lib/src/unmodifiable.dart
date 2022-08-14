@@ -60,4 +60,11 @@ extension ListX<E> on List<E> {
         if (i != index) elementAt(i)
     ];
   }
+
+  List<E> copyWhere(bool Function(E element) test) {
+    return [
+      for (var e in this)
+        if (test(e)) e
+    ];
+  }
 }
