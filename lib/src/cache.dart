@@ -39,6 +39,19 @@ extension FirebaseFirestoreX on FirebaseFirestore {
 }
 
 extension DocumentReferenceX<R> on DocumentReference<R> {
+  Future<DocumentSnapshot<R>> cachedGet() async {
+    // TODO
+    try {
+      final snapshot = await get(const GetOptions(source: Source.cache));
+      if (snapshot.exists) {
+        return snapshot;
+      }
+      return get();
+    } catch (error, stackTrace) {
+      Error.throwWithStackTrace(error, stackTrace);
+    }
+  }
+
   Future<void> cachedDelete() async {
     // TODO
     throw UnimplementedError();
