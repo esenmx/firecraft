@@ -15,7 +15,7 @@ extension MapX<K, V> on Map<K, V> {
   Map<K, V> copyRemove(K id) {
     return {
       for (var k in keys)
-        if (k != id) k: this[k]!
+        if (k != id) k: this[k] as V
     };
   }
 

@@ -8,9 +8,9 @@ class ArrayConv<O, J> implements JsonConverter<List<O>, Map<String, dynamic>> {
 
   @override
   List<O> fromJson(Map json) {
-    final keys = json.keys.toList()..sort();
+    final sortedKeys = json.keys.toList()..sort();
     return [
-      for (var k in keys)
+      for (var k in sortedKeys)
         if (conv == null) json[k] as O else conv!.fromJson(json[k] as J)
     ];
   }

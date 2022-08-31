@@ -10,10 +10,6 @@ void main() async {
     final toJson = const TimestampConv().toJson;
     final fromJson = const TimestampConv().fromJson;
 
-    test('fromJson(null) error', () {
-      expect(() => fromJson(null), throwsA(isA<AssertionError>()));
-    });
-
     test('serverTimestamp', () async {
       final doc = collection.doc();
       await doc.set({'timestamp': toJson(kServerTimestampSentinel)});

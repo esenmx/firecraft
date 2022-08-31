@@ -27,7 +27,7 @@ class Entity {
   Entity(this.dateTime);
 
   factory Entity.fromJson(Map<String, Object?> json) {
-    return Entity(const TimestampConv().fromJson(json['dateTime']));
+    return Entity(const TimestampConv().fromJson(json['dateTime']!));
   }
 
   Map<String, Object?> toJson() => {'dateTime': FieldValue.serverTimestamp()};

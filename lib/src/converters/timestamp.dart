@@ -5,11 +5,9 @@ class TimestampConv implements JsonConverter<DateTime, Object?> {
 
   @override
   DateTime fromJson(Object? value) {
-    assert(
-      value is Timestamp,
-      'a non-null `Timestamp` value assertion failed.'
-      'if your field is nullable, you must use `NullTimestampConv`',
-    );
+    if (value == null) {
+      return DateTime.now();
+    }
     return (value as Timestamp).toDate();
   }
 
@@ -27,10 +25,6 @@ class NullTimestampConv implements JsonConverter<DateTime?, Object?> {
 
   @override
   DateTime? fromJson(Object? value) {
-    assert(
-      value == null || value is Timestamp,
-      'a non `Timestamp` value returned',
-    );
     return (value as Timestamp?)?.toDate();
   }
 
