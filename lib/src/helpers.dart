@@ -12,6 +12,6 @@ extension IterableDocumentSnapshotX<D> on Iterable<DocumentSnapshot<D>> {
   }
 }
 
-extension DateTimeFirestoreX on DateTime? {
-  Timestamp? get toTimestamp => this == null ? null : Timestamp.fromDate(this!);
+extension DateTimeFirestoreX on DateTime {
+  Timestamp get toTimestamp => Timestamp.fromDate(this);
 }
