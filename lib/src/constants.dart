@@ -16,24 +16,24 @@ part of firestorex;
 /// query.('deletedAt', isNull: true);
 /// query.('disabledAt', isNull: true);
 /// ```
-/// [includeIfNull] is perfect fit for this case:
+/// [kIncludeIfNull] is perfect fit for this case:
 /// ```dart
 /// @includeIfNull @nullTimestampConv DateTime? disabledAt,
 /// ```
 ///
 /// Favorably, only put null values into json if you need to query them,
 /// otherwise it will increase both database and traffic size for no reason.
-const includeIfNull = JsonKey(includeIfNull: true);
+const kIncludeIfNull = JsonKey(includeIfNull: true);
 
 /// https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
 const int kFirestoreEqualityLimit = 10;
 
 /// Because of type safety, sometimes it can be tedious to play between
-/// [DateTime] and [FieldValue], [kServerTimestampSentinel] solves this issue.
+/// [DateTime] and [FieldValue], [kFirestoreTimestamp] solves this issue.
 ///
-/// [TimestampConv()]/[NullTimestampConv()] detects [kServerTimestampSentinel]
+/// [TimestampConv()]/[NullTimestampConv()] detects [kFirestoreTimestamp]
 /// value and [FieldValue.serverTimestamp] is put into the [json] instead the
-/// [kServerTimestampSentinel] value.
+/// [kFirestoreTimestamp] value.
 ///
 /// min possible [DateTime] value is chosen for least conflict.
-final kServerTimestampSentinel = DateTime.utc(-271821, 04, 20);
+final kFirestoreTimestamp = DateTime.utc(-271821, 04, 20);

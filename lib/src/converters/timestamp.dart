@@ -13,7 +13,7 @@ class TimestampConv implements JsonConverter<DateTime, Object?> {
 
   @override
   Object? toJson(DateTime value) {
-    if (value == kServerTimestampSentinel) {
+    if (value == kFirestoreTimestamp) {
       return FieldValue.serverTimestamp();
     }
     return Timestamp.fromDate(value);
@@ -30,7 +30,7 @@ class NullTimestampConv implements JsonConverter<DateTime?, Object?> {
 
   @override
   Object? toJson(DateTime? value) {
-    if (value == kServerTimestampSentinel) {
+    if (value == kFirestoreTimestamp) {
       return FieldValue.serverTimestamp();
     }
     return value == null ? null : Timestamp.fromDate(value);

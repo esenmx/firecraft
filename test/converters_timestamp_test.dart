@@ -12,7 +12,7 @@ void main() async {
 
     test('serverTimestamp', () async {
       final doc = collection.doc();
-      await doc.set({'timestamp': toJson(kServerTimestampSentinel)});
+      await doc.set({'timestamp': toJson(kFirestoreTimestamp)});
       final json = await doc.get().then((value) => value.data());
 
       expect(fromJson(json?['timestamp']), isA<DateTime>());
@@ -50,7 +50,7 @@ void main() async {
 
     test('serverTimestamp', () async {
       final doc = collection.doc();
-      await doc.set({'timestamp': toJson(kServerTimestampSentinel)});
+      await doc.set({'timestamp': toJson(kFirestoreTimestamp)});
       final json = await doc.get().then((value) => value.data());
 
       expect(fromJson(json?['timestamp']), isA<DateTime>());

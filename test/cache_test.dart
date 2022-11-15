@@ -16,7 +16,7 @@ void main(List<String> args) {
       },
     );
     for (int i = 0; i < 1000; i++) {
-      collection.add(Entity(kServerTimestampSentinel));
+      collection.add(Entity(kFirestoreTimestamp));
     }
   });
 }
