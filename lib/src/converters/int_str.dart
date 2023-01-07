@@ -1,7 +1,11 @@
 part of firestorex;
 
-/// It's inefficient to store small integers with Firestore because integers
-/// are always 64bit.
+/// [CAUTION!] [This is only valid for IMMUTABLE integers].
+/// Updates with [FieldValue.increment(value)] won't work.
+///
+/// It's inefficient to store small integers with Firestore because numbers are
+/// always 64bit on [FirebaseFirestore]. Hence, storing very small numbers as
+/// quantitative is storage size inefficient.
 ///
 /// Converting small integers to [String] can save considerable space while
 /// keeping the console usable(unlike [Blob] conversion, which uses [Base64]).
