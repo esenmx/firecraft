@@ -1,71 +1,58 @@
 part of firestorex;
 
-/// Collection for querying based on [updatedAt] field, also essential if you
-/// are caching with local database([Sqlite], [SharedPreferences], [Hive] etc...).
-/// Store queried documents with [dateTime] field so when you query again.
-/// A typical query would be:
+/// Customized [CollectionReference] for caching strategies based on 'updatedAt'
+/// field. Please be sure consistency of [updatedAtKey] through operations.
+///
 /// ```dart
-/// collection.where('timestamp', isGreaterThan: collectionObject.timestamp);
+/// collection.where('updatedAt', isGreaterThan: collectionObject.timestamp);
 /// ```
 /// Only newer documents will be queried by doing so.
 /// [handler] callback will let you manipulate your local database
-///
-/// todo delete handler
 extension FirebaseFirestoreX on FirebaseFirestore {
   CollectionReference<R> cachedCollection<R>({
     required String path,
-    required FromJson<R> fromJson,
-    required ToJson<R> toJson,
-    required FirestoreCacheOnData<R> onData,
-    String timestampKey = 'updatedAt',
+    required R Function(Map<String, dynamic> json) fromJson,
+    required Map<String, dynamic> Function(R value) toJson,
+    required void Function(String id, R data, DateTime updatedAt) onData,
+    String updatedAtKey = 'updatedAt',
   }) {
     return collection(path).withConverter<R>(
       fromFirestore: (snapshot, _) {
         final data = snapshot.data()!;
         final value = fromJson(data);
-        if (data[timestampKey] != null) {
-          final ts = const TimestampConv().fromJson(data[timestampKey]);
+        if (data[updatedAtKey] != null) {
+          final ts = const TimestampConv().fromJson(data[updatedAtKey]);
           onData(snapshot.id, value, ts);
         }
         return value;
       },
       toFirestore: (R value, _) {
         final json = toJson(value);
-        assert(!json.containsKey(timestampKey), '$timestampKey key occupied');
-        return json..[timestampKey] = FieldValue.serverTimestamp();
+        assert(!json.containsKey(updatedAtKey), '$updatedAtKey key conflict');
+        return json..[updatedAtKey] = FieldValue.serverTimestamp();
       },
     );
   }
 }
 
-extension DocumentReferenceX<R> on DocumentReference<R> {
-  Future<DocumentSnapshot<R>> cachedGet() async {
-    // TODO
-    try {
-      final snapshot = await get(const GetOptions(source: Source.cache));
-      if (snapshot.exists) {
-        return snapshot;
-      }
-      return get();
-    } catch (error, stackTrace) {
-      Error.throwWithStackTrace(error, stackTrace);
-    }
-  }
-
-  Future<void> cachedDelete() async {
-    // TODO
-    throw UnimplementedError();
+extension DocumentReferenceX<T> on DocumentReference<T> {
+  Future<void> cachedUpdate(
+    Map<String, Object?> data, [
+    String updatedAtKey = 'updatedAt',
+  ]) {
+    return update(data..[updatedAtKey] = FieldValue.serverTimestamp());
   }
 }
 
-typedef FirestoreCacheOnData<R> = void Function(
-  String id,
-  R data,
-  DateTime timestamp,
-);
-typedef FirestoreCacheOnDelete<R> = void Function(
-  String id,
-  DateTime timestamp,
-);
-typedef FromJson<R> = R Function(Map<String, dynamic> json);
-typedef ToJson<R> = Map<String, dynamic> Function(R value);
+extension TransactionX on Transaction {
+  Transaction cachedUpdate(
+    DocumentReference documentReference,
+    Map<String, Object?> data, [
+    String updatedAtKey = 'updatedAt',
+  ]) {
+    return update(
+      documentReference,
+      data..[updatedAtKey] = FieldValue.serverTimestamp(),
+    );
+  }
+}
