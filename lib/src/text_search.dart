@@ -112,7 +112,7 @@ extension TextSearchBuilder on String {
 
 extension SearchQuery<T> on Query<T> {
   /// Use with [textSearchMap]. Generates the search query, typically by
-  /// [TextField] input. Be careful of [kFirestoreEqualityLimit].
+  /// [TextField] input. Be careful of [_kFirestoreEqualityLimit].
   Query<T> textSearchQuery(
     String text, {
     String prefix = 'search.',

@@ -5,9 +5,9 @@ part of firestorex;
 /// Methods with [copy] prefix means, returns a new shallow copy; hence,
 /// it does not mutate the caller object.
 ///
-/// Using Unmodifiable collections is recommended for non-small projects.
-/// Beware your application may suffer skipped frames with large data sets,
-/// if so use mutable collections or use [Isolate].
+/// Using Unmodifiable collections is recommended for non-trivial projects.
+/// Beware your application may suffer skipped frames with large data sets.
+/// Otherwise, consider using mutable collections.
 ///
 /// Every unmodifiable collection operation starts with [copy] prefix.
 
@@ -32,7 +32,7 @@ extension MapX<K, V> on Map<K, V> {
       newValue = update(value);
     } else {
       if (ifAbsent == null) {
-        throw ArgumentError('$key not found in map (tip: provide ifAbsent)');
+        throw ArgumentError('`$key` not found and ifAbsent is `null`');
       }
       newValue = ifAbsent.call();
     }
@@ -40,7 +40,10 @@ extension MapX<K, V> on Map<K, V> {
   }
 
   Map<K, V> copyAddEntries(Iterable<MapEntry<K, V>> entries) {
-    return {...this, for (var e in entries) e.key: e.value};
+    return {
+      ...this,
+      for (var e in entries) e.key: e.value,
+    };
   }
 }
 
