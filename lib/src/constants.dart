@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 /// Because of type safety, sometimes it can be tedious to play between
 /// [DateTime] and [FieldValue], [kFirestorexTimestamp] solves this issue.

@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 class BlobConv implements JsonConverter<Uint8List, Blob> {
   const BlobConv();

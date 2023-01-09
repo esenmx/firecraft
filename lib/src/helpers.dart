@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 extension QuerySnapshotX<D> on QuerySnapshot<D> {
   Map<String, D> asIdDataMap() {

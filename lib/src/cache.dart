@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 /// Customized [CollectionReference] for caching strategies based on 'updatedAt'
 /// field. Please be sure consistency of [updatedAtKey] through operations.

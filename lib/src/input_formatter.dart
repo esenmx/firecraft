@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 /// TODO doc
 class FirestoreSearchInputFormatter extends TextInputFormatter {

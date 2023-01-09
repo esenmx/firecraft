@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 extension TextSearchBuilder on String {
   /// An opinionated way to handle text searches in [Firestore]

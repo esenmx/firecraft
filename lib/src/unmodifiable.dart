@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 /// As of [freezed] 2.0, collections are unmodifiable by default.
 /// To work with collections effectively, you can use this extensions methods.

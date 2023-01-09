@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:firestorex/firestorex.dart';
+import 'package:firecraft/firecraft.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:test_utils/test_utils.dart';
 

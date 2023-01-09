@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 /// [CAUTION!] [This is only valid for IMMUTABLE integers].
 /// Updates with [FieldValue.increment(value)] won't work.

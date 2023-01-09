@@ -1,5 +1,5 @@
 import 'package:example/src/model.dart';
-import 'package:firestorex/firestorex.dart';
+import 'package:firecraft/firecraft.dart';
 import 'package:flutter/material.dart';
 
 class QueryGetPage extends StatelessWidget {

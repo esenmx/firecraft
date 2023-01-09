@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 /// [O] is element type, [J] json type of element
 class ArrayConv<O, J> implements JsonConverter<List<O>, Map<String, dynamic>> {

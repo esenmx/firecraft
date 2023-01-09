@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 /// Very abstract and yet extensible way to build paginated [Firestore] views
 /// Requires [ScrollView] as a child and any of [ListView], [GridView],

@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:firestorex/firestorex.dart';
+import 'package:firecraft/firecraft.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

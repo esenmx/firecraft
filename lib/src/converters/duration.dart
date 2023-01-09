@@ -1,4 +1,4 @@
-part of firestorex;
+part of firecraft;
 
 class DurationConv implements JsonConverter<Duration, int> {
   const DurationConv();

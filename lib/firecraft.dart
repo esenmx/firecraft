@@ -1,4 +1,4 @@
-library firestorex;
+library firecraft;
 
 import 'dart:async';
 
