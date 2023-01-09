@@ -1,14 +1,14 @@
 part of firecraft;
 
 /// Because of type safety, sometimes it can be tedious to play between
-/// [DateTime] and [FieldValue], [kFirestorexTimestamp] solves this issue.
+/// [DateTime] and [FieldValue], [kFirecraftTimestamp] solves this issue.
 ///
-/// [TimestampConv()]/[NullTimestampConv()] detects [kFirestorexTimestamp]
+/// [TimestampConv()]/[NullTimestampConv()] detects [kFirecraftTimestamp]
 /// value and [FieldValue.serverTimestamp] is put into the [json] instead the
-/// [kFirestorexTimestamp] value.
+/// [kFirecraftTimestamp] value.
 ///
 /// min possible [DateTime] value is chosen for least conflict.
-final kFirestorexTimestamp = DateTime.utc(0);
+final kFirecraftTimestamp = DateTime.utc(0);
 
 /// Alias for [JsonKey(includeIfNull: true)]
 /// ```dart

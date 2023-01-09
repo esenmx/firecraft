@@ -8,7 +8,7 @@ part of firecraft;
 /// ```
 /// Only newer documents will be queried by doing so.
 /// [handler] callback will let you manipulate your local database
-extension FirebaseFirestoreX on FirebaseFirestore {
+extension FirebaseFirecraft on FirebaseFirestore {
   CollectionReference<R> cachedCollection<R>({
     required String path,
     required R Function(Map<String, dynamic> json) fromJson,
