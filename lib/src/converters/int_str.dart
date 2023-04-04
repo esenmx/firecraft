@@ -1,7 +1,7 @@
 part of firecraft;
 
-/// [CAUTION!] [This is only valid for IMMUTABLE integers].
-/// Updates with [FieldValue.increment(value)] won't work.
+/// [CAUTION!!!] [IntStrConv] is only sensible for IMMUTABLE integers.
+/// Because [FieldValue.increment(value)] operations will be irrelevant.
 ///
 /// It's inefficient to store small integers with Firestore because numbers are
 /// always 64bit on [FirebaseFirestore]. Hence, storing very small numbers as
@@ -20,8 +20,8 @@ class IntStrConv implements JsonConverter<int, String> {
   String toJson(int object) => object.toString();
 }
 
-class NullIntStrConv implements JsonConverter<int?, String?> {
-  const NullIntStrConv();
+class IntStrNConv implements JsonConverter<int?, String?> {
+  const IntStrNConv();
 
   @override
   int? fromJson(String? json) => json == null ? null : int.parse(json);

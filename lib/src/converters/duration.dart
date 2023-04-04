@@ -10,8 +10,8 @@ class DurationConv implements JsonConverter<Duration, int> {
   int toJson(Duration object) => object.inMicroseconds;
 }
 
-class NullDurationConv implements JsonConverter<Duration?, int?> {
-  const NullDurationConv();
+class DurationNConv implements JsonConverter<Duration?, int?> {
+  const DurationNConv();
 
   @override
   Duration? fromJson(int? json) {

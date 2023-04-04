@@ -6,13 +6,13 @@ import 'package:test_utils/test_utils.dart';
 
 void main(List<String> args) {
   testWidgets('cachedCollection', (t) async {
-    final collection = FakeFirebaseFirestore().cachedCollection<Entity>(
+    final collection = FakeFirebaseFirestore().inventory<Entity>(
       path: 'test',
       fromJson: (json) => Entity.fromJson(json),
       toJson: (val) => val.toJson(),
       onData: (id, val, ts) {
         const d = Duration(milliseconds: 1); // may vary depend on machine
-        expect(val.dateTime.withinDuration(ts, d), isTrue);
+        expect(val.dateTime.withinDuration(ts!, d), isTrue);
       },
     );
     for (int i = 0; i < 1000; i++) {

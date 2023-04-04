@@ -10,8 +10,8 @@ class BlobConv implements JsonConverter<Uint8List, Blob> {
   Blob toJson(Uint8List object) => Blob(object);
 }
 
-class NullBlobConv implements JsonConverter<Uint8List?, Blob?> {
-  const NullBlobConv();
+class BlobNConv implements JsonConverter<Uint8List?, Blob?> {
+  const BlobNConv();
 
   @override
   Uint8List? fromJson(Blob? json) => json?.bytes;

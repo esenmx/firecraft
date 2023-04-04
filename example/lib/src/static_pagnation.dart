@@ -2,13 +2,13 @@ import 'package:example/src/model.dart';
 import 'package:firecraft/firecraft.dart';
 import 'package:flutter/material.dart';
 
-class QueryGetPage extends StatelessWidget {
-  const QueryGetPage({Key? key}) : super(key: key);
+class StaticPaginationPage extends StatelessWidget {
+  const StaticPaginationPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Query Get Example')),
+      appBar: AppBar(title: const Text('Static Pagination Example')),
       body: FirestoreStaticPaginationView<Model>(
         query: collection.limit(10).orderBy('text'),
         onError: (query, error, stackTrace) {

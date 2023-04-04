@@ -38,8 +38,8 @@ void main() async {
   });
 
   group('NullTimestampConv', () {
-    final toJson = const NullTimestampConv().toJson;
-    final fromJson = const NullTimestampConv().fromJson;
+    final toJson = const TimestampNConv().toJson;
+    final fromJson = const TimestampNConv().fromJson;
 
     test('null value', () async {
       final doc = collection.doc();

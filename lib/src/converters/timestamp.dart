@@ -20,8 +20,8 @@ class TimestampConv implements JsonConverter<DateTime, Object?> {
   }
 }
 
-class NullTimestampConv implements JsonConverter<DateTime?, Object?> {
-  const NullTimestampConv();
+class TimestampNConv implements JsonConverter<DateTime?, Object?> {
+  const TimestampNConv();
 
   @override
   DateTime? fromJson(Object? value) {

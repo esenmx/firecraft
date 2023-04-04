@@ -1,4 +1,4 @@
-import 'package:example/src/query_get.dart';
+import 'package:example/src/static_pagnation.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
@@ -26,17 +26,17 @@ class Home extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              child: const Text('Query Get Example'),
+              child: const Text('Static Pagination Example'),
               onPressed: () {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (context) {
-                  return const QueryGetPage();
+                  return const StaticPaginationPage();
                 }));
               },
             ),
             const SizedBox(height: 48),
             ElevatedButton(
-              child: const Text('Query Listen Example'),
+              child: const Text('Live Pagination Example'),
               onPressed: () {},
             ),
           ],
