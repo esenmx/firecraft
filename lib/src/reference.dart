@@ -13,7 +13,7 @@ extension FirebaseFirecraft on FirebaseFirestore {
     required String path,
     required R Function(Map<String, dynamic> json) fromJson,
     required Map<String, dynamic> Function(R value) toJson,
-    required void Function(String id, R data, DateTime? updatedAt)? onData,
+    void Function(String id, R data, DateTime? updatedAt)? onData,
     String updatedAtKey = 'updatedAt',
   }) {
     return collection(path).withConverter<R>(
