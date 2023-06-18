@@ -1,8 +1,9 @@
 part of firecraft;
 
 /// [O] is element type, [J] json type of element
-class ArrayConv<O, J> implements JsonConverter<List<O>, Map<String, dynamic>> {
-  const ArrayConv([this.conv]);
+class NestedArrayConv<O, J>
+    implements JsonConverter<List<O>, Map<String, dynamic>> {
+  const NestedArrayConv([this.conv]);
 
   final JsonConverter<O, J>? conv;
 

@@ -1,28 +1,36 @@
 part of firecraft;
 
+/// Invoked whenever an updated data fetched from the collection
+typedef OnFirestoreDocumentData<R> = void Function(
+    String id, R value, DateTime? updatedAt);
+
 /// Customized [CollectionReference] for caching strategies based on 'updatedAt'
-/// field. Be sure the consistency of [updatedAtKey] through operations.
+/// and 'isDeleted' fields. Be sure the consistency of [updatedAtKey] and
+/// [isDeletedKey] through operations.
 ///
 /// ```dart
 /// collection.where('updatedAt', isGreaterThan: lastCachedObject.timestamp);
 /// ```
+///
 /// Only newer documents will be queried by doing so.
-/// [handler] callback will let you manipulate your local database
 extension FirebaseFirecraft on FirebaseFirestore {
   CollectionReference<R> inventory<R>({
     required String path,
     required R Function(Map<String, dynamic> json) fromJson,
     required Map<String, dynamic> Function(R value) toJson,
-    void Function(String id, R data, DateTime? updatedAt)? onData,
+    OnFirestoreDocumentData<R>? onData,
     String updatedAtKey = 'updatedAt',
   }) {
     return collection(path).withConverter<R>(
       fromFirestore: (snapshot, _) {
         final data = snapshot.data()!;
         final value = fromJson(data);
-        if (onData != null && data[updatedAtKey] != null) {
-          final ts = const TimestampConv().fromJson(data[updatedAtKey]);
-          onData.call(snapshot.id, value, ts);
+        if (data.containsKey(updatedAtKey)) {
+          onData?.call(
+            snapshot.id,
+            value,
+            const TimestampConv().fromJson(data[updatedAtKey]),
+          );
         }
         return value;
       },
@@ -36,6 +44,8 @@ extension FirebaseFirecraft on FirebaseFirestore {
 }
 
 extension DocumentReferenceX<T> on DocumentReference<T> {
+  /// Replacement for [DocumentReference.update], automatically adds
+  /// [updatedAtKey] timestamp
   Future<void> craft(
     Map<String, dynamic> data, [
     String updatedAtKey = 'updatedAt',
@@ -45,6 +55,8 @@ extension DocumentReferenceX<T> on DocumentReference<T> {
 }
 
 extension TransactionX on Transaction {
+  /// Replacement for [Transaction.update], automatically adds [updatedAtKey]
+  /// timestamp
   Transaction craft(
     DocumentReference documentReference,
     Map<String, Object?> data, [

@@ -14,7 +14,7 @@ class _Conv implements JsonConverter<int, int> {
 
 void main() {
   group('ArrayConv', () {
-    const conv = ArrayConv<int, int>(_Conv());
+    const conv = NestedArrayConv<int, int>(_Conv());
     test('fromJson', () {
       expect(conv.fromJson({'0': 9, '1': 8}), [9, 8]);
       expect(conv.fromJson({}), []);
@@ -28,7 +28,8 @@ void main() {
   });
 
   group('NestedArrayConv', () {
-    const conv = ArrayConv<List<int>, Map>(ArrayConv<int, int>(_Conv()));
+    const conv =
+        NestedArrayConv<List<int>, Map>(NestedArrayConv<int, int>(_Conv()));
     test('fromJson', () {
       expect(
           conv.fromJson({
