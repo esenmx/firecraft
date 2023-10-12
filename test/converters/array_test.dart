@@ -34,11 +34,11 @@ void main() {
       expect(
           conv.fromJson({
             '0': {'0': 1},
-            '1': {}
+            '1': {},
           }),
           [
             [1],
-            []
+            [],
           ]);
       expect(conv.fromJson({}), []);
       expect(conv.fromJson({'1': {}}), [[]]);
@@ -49,7 +49,7 @@ void main() {
       expect(
           conv.toJson([
             [1, 2],
-            []
+            [],
           ]),
           {
             '0': {'0': 1, '1': 2},

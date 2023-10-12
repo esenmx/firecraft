@@ -10,7 +10,8 @@ void main() async {
     final formatter = FirestoreSearchInputFormatter();
 
     /// Updates
-    var oldValue = 'text'.value, newValue = 'text '.value;
+    var oldValue = 'text'.value;
+    var newValue = 'text '.value;
     expect(formatter.formatEditUpdate(oldValue, newValue).text, newValue.text);
 
     /// Won't update

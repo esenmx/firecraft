@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../../firecraft.dart';
 
 class TimestampConv implements JsonConverter<DateTime, Object?> {
   const TimestampConv();

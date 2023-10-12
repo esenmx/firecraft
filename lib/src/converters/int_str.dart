@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../../firecraft.dart';
 
 /// [CAUTION!!!] [IntStrConv] is only sensible for IMMUTABLE integers.
 /// Because [FieldValue.increment(value)] operations will be irrelevant.

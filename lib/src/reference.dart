@@ -1,8 +1,11 @@
-part of firecraft;
+part of '../firecraft.dart';
 
 /// Invoked whenever an updated data fetched from the collection
 typedef OnFirestoreDocumentData<R> = void Function(
-    String id, R value, DateTime? updatedAt);
+  String id,
+  R value,
+  DateTime? updatedAt,
+);
 
 /// Customized [CollectionReference] for caching strategies based on 'updatedAt'
 /// and 'isDeleted' fields. Be sure the consistency of [updatedAtKey] and

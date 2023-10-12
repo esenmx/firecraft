@@ -1,14 +1,14 @@
-part of firecraft;
+part of '../firecraft.dart';
 
 extension QuerySnapshotX<D> on QuerySnapshot<D> {
   Map<String, D> asIdDataMap() {
-    return {for (var d in docs) d.id: d.data()};
+    return {for (final d in docs) d.id: d.data()};
   }
 }
 
 extension IterableDocumentSnapshotX<D> on Iterable<DocumentSnapshot<D>> {
   Map<String, D?> asIdDataMap() {
-    return {for (var d in this) d.id: d.data()};
+    return {for (final d in this) d.id: d.data()};
   }
 }
 

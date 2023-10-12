@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../firecraft.dart';
 
 extension TextSearchBuilder on String {
   /// An opinionated way to handle text searches in [Firestore]
@@ -24,9 +24,9 @@ extension TextSearchBuilder on String {
   }) sync* {
     assert(minKeywordLength > 1, 'slice size must be greater than 1');
     final strings = _expand(separator);
-    for (var s in strings) {
+    for (final s in strings) {
       if (s.length > minKeywordLength) {
-        var buffer = StringBuffer(s.substring(0, minKeywordLength - 1));
+        final buffer = StringBuffer(s.substring(0, minKeywordLength - 1));
         for (int i = minKeywordLength - 1; i < s.length; i++) {
           buffer.writeCharCode(s.codeUnitAt(i));
           yield buffer.toString();
@@ -106,7 +106,7 @@ extension TextSearchBuilder on String {
       minKeywordLength: minKeywordLength,
       separator: separator,
     );
-    return {for (var e in index) e: true};
+    return {for (final e in index) e: true};
   }
 }
 

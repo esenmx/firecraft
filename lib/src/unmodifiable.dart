@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../firecraft.dart';
 
 /// As of [freezed] 2.0, collections are unmodifiable by default.
 /// To work with collections effectively, you can use this extensions methods.
@@ -14,8 +14,8 @@ part of firecraft;
 extension MapX<K, V> on Map<K, V> {
   Map<K, V> copyRemove(K id) {
     return {
-      for (var k in keys)
-        if (k != id) k: this[k] as V
+      for (final k in keys)
+        if (k != id) k: this[k] as V,
     };
   }
 
@@ -42,7 +42,7 @@ extension MapX<K, V> on Map<K, V> {
   Map<K, V> copyAddEntries(Iterable<MapEntry<K, V>> entries) {
     return {
       ...this,
-      for (var e in entries) e.key: e.value,
+      for (final e in entries) e.key: e.value,
     };
   }
 }
@@ -52,22 +52,22 @@ extension ListX<E> on List<E> {
 
   List<E> copyRemove(E value) {
     return [
-      for (var e in this)
-        if (e != value) e
+      for (final e in this)
+        if (e != value) e,
     ];
   }
 
   List<E> copyRemoveAt(int index) {
     return [
       for (int i = 0; i < length; i++)
-        if (i != index) elementAt(i)
+        if (i != index) elementAt(i),
     ];
   }
 
   List<E> copyWhere(bool Function(E element) test) {
     return [
-      for (var e in this)
-        if (test(e)) e
+      for (final e in this)
+        if (test(e)) e,
     ];
   }
 }

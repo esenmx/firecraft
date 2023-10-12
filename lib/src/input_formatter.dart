@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../firecraft.dart';
 
 /// TODO doc
 class FirestoreSearchInputFormatter extends TextInputFormatter {
@@ -11,7 +11,10 @@ class FirestoreSearchInputFormatter extends TextInputFormatter {
   final int length;
 
   @override
-  TextEditingValue formatEditUpdate(oldValue, newValue) {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     final newText = newValue.text;
     if (newText.startsWith(separator)) {
       return oldValue;

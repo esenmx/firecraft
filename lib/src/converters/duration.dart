@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../../firecraft.dart';
 
 class DurationConv implements JsonConverter<Duration, int> {
   const DurationConv();

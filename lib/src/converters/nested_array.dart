@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../../firecraft.dart';
 
 /// [O] is element type, [J] json type of element
 class NestedArrayConv<O, J>
@@ -8,17 +8,17 @@ class NestedArrayConv<O, J>
   final JsonConverter<O, J>? conv;
 
   @override
-  List<O> fromJson(Map json) {
+  List<O> fromJson(Map<String, dynamic> json) {
     if (json.isEmpty) {
       return [];
     }
     final keys = json.keys.map((e) => int.parse(e)).toList()..sort();
     return [
-      for (var key in keys)
+      for (final key in keys)
         if (conv == null)
           json[key.toString()] as O
         else
-          conv!.fromJson(json[key.toString()] as J)
+          conv!.fromJson(json[key.toString()] as J),
     ];
   }
 
@@ -29,7 +29,7 @@ class NestedArrayConv<O, J>
     }
     return {
       for (var i = 0; i < object.length; i++)
-        i.toString(): conv == null ? object[i] as J : conv!.toJson(object[i])
+        i.toString(): conv == null ? object[i] as J : conv!.toJson(object[i]),
     };
   }
 }

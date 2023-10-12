@@ -7,22 +7,19 @@ environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
+  cloud_firestore:
   flutter:
     sdk: flutter
-  cloud_firestore:
   json_annotation:
 
 dev_dependencies:
+  fake_async:
+  fake_cloud_firestore:
   flutter_test:
     sdk: flutter
-  flutter_lints:
-  fake_cloud_firestore:
+  lint: ^2.1.2
   mockito:
-  fake_async:
   rand:
-    git:
-      url: https://github.com/esenmx/rand
-      ref: main
   test_utils:
     git:
       url: https://github.com/esenmx/test_utils

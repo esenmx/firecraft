@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../../firecraft.dart';
 
 class BlobConv implements JsonConverter<Uint8List, Blob> {
   const BlobConv();

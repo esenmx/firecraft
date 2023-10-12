@@ -1,4 +1,4 @@
-part of firecraft;
+part of '../firecraft.dart';
 
 /// Very abstract and yet extensible way to build paginated [Firestore] views
 /// Requires [ScrollView] as a child and any of [ListView], [GridView],
@@ -252,7 +252,7 @@ class FirestoreLivePaginationView<T> extends FirestorePaginationView<T> {
 class _FirestoreLivePaginationViewState<T>
     extends State<FirestoreLivePaginationView<T>> {
   StreamSubscription<QuerySnapshot<T>>? subscription;
-  var docs = <QueryDocumentSnapshot<T>>[];
+  List<QueryDocumentSnapshot<T>> docs = <QueryDocumentSnapshot<T>>[];
 
   late int totalLimit = widget.limit;
 
@@ -286,20 +286,23 @@ class _FirestoreLivePaginationViewState<T>
       }
 
       subscription?.cancel();
-      subscription = stream.listen((event) {
-        widget.onSnapshot?.call(query, event);
-        if (isPaginating && event.size < totalLimit) {
-          widget.onComplete?.call();
-        }
-        if (mounted) {
-          setState(() {
-            isPaginating = false;
-            docs = event.docs;
-          });
-        }
-      }, onError: (error, stackTrace) {
-        widget.onError?.call(query, error, stackTrace);
-      });
+      subscription = stream.listen(
+        (event) {
+          widget.onSnapshot?.call(query, event);
+          if (isPaginating && event.size < totalLimit) {
+            widget.onComplete?.call();
+          }
+          if (mounted) {
+            setState(() {
+              isPaginating = false;
+              docs = event.docs;
+            });
+          }
+        },
+        onError: (error, StackTrace stackTrace) {
+          widget.onError?.call(query, error, stackTrace);
+        },
+      );
     } catch (error, stackTrace) {
       widget.onError?.call(query, error, stackTrace);
     }
